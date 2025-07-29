@@ -167,6 +167,322 @@
             align-items: center;
             z-index: 1000;
         }
+
+        .refresh-timer {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-left: 8px;
+        }
+        
+        .supervisor-image-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #3b82f6;
+            position: relative;
+        }
+        
+        .supervisor-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-upload-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .supervisor-name-input {
+            text-align: center;
+            border: none;
+            border-bottom: 2px solid #3b82f6;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e40af;
+            background: transparent;
+            width: 100%;
+            padding: 4px;
+            margin-top: 12px;
+        }
+        
+        .supervisor-name-input:focus {
+            outline: none;
+            border-bottom: 2px solid #1e40af;
+        }
+        
+        /* Card Carousel Styles */
+        .card-carousel {
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+        }
+        
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: transform 0.8s ease, opacity 0.8s ease;
+            padding: 1.5rem;
+        }
+        
+        .carousel-slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .carousel-slide.prev {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+        
+        .carousel-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .carousel-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #cbd5e1;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        
+        .carousel-indicator.active {
+            background-color: #3b82f6;
+            transform: scale(1.2);
+        }
+        
+        .carousel-title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #f8fafc;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+        }
+        
+        .carousel-content {
+            margin-top: 3.5rem;
+            height: calc(100% - 3.5rem);
+            overflow-y: auto;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes rotateIn {
+            from { transform: rotate(-5deg) scale(0.9); opacity: 0; }
+            to { transform: rotate(0) scale(1); opacity: 1; }
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes slideInLeft {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.5s forwards;
+        }
+        
+        .animate-scale-in {
+            animation: scaleIn 0.5s forwards;
+        }
+        
+        .animate-rotate-in {
+            animation: rotateIn 0.6s forwards;
+        }
+        
+        .animate-bounce-in {
+            animation: bounceIn 0.8s forwards;
+        }
+        
+        .animate-slide-left {
+            animation: slideInLeft 0.5s forwards;
+        }
+        
+        .animate-slide-right {
+            animation: slideInRight 0.5s forwards;
+        }
+        
+        .manpower-ticker-item {
+            animation: slideUp 0.5s forwards;
+        }
+        
+        /* Vertical Manpower Ticker */
+        .vertical-ticker-container {
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .vertical-ticker {
+            position: absolute;
+            width: 100%;
+            transition: transform 0.5s ease;
+        }
+        
+        .vertical-ticker-item {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .vertical-ticker-item:hover {
+            background-color: #f1f5f9;
+            transform: translateX(5px);
+        }
+        
+        /* Summary Card Animations */
+        .summary-card {
+            transition: all 0.3s ease;
+            transform-origin: center;
+            overflow: hidden;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .summary-card:hover .summary-icon {
+            transform: scale(1.1) rotate(10deg);
+        }
+        
+        .summary-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .progress-value {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-value::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Floating animation for supervisor card */
+        .float-animation {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* Achievement highlight animation */
+        .achievement-item {
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 5px;
+        }
+        
+        .achievement-item:hover {
+            transform: translateX(5px);
+            color: #1e40af;
+        }
+        
+        .achievement-item::before {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 50%;
+            width: 0;
+            height: 2px;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+            transform: translateY(-50%);
+        }
+        
+        .achievement-item:hover::before {
+            width: 5px;
+        }
     </style>
 </head>
 <body>
@@ -196,12 +512,15 @@
                         <p class="text-sm text-gray-500">Last Updated</p>
                         <p class="text-md font-semibold text-gray-800" id="last-updated">Loading...</p>
                     </div>
-                    <button id="refresh-btn" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Refresh Data
-                    </button>
+                    <div class="flex items-center">
+                        <button id="refresh-btn" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Refresh Data
+                        </button>
+                        <span class="refresh-timer" id="refresh-timer">Auto-refresh in 60:00</span>
+                    </div>
                 </div>
             </div>
         </header>
@@ -210,13 +529,13 @@
         <main class="container mx-auto px-4 py-8">
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="dashboard-card bg-white p-6">
+                <div class="dashboard-card bg-white p-6 summary-card" id="erection-card">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Total Erection</p>
                             <h3 class="text-2xl font-bold text-gray-800" id="total-erection">Loading...</h3>
                         </div>
-                        <div class="bg-blue-100 p-3 rounded-full">
+                        <div class="bg-blue-100 p-3 rounded-full summary-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
@@ -233,13 +552,13 @@
                     </div>
                 </div>
 
-                <div class="dashboard-card bg-white p-6">
+                <div class="dashboard-card bg-white p-6 summary-card" id="dismantling-card">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Total Dismantling</p>
                             <h3 class="text-2xl font-bold text-gray-800" id="total-dismantling">Loading...</h3>
                         </div>
-                        <div class="bg-green-100 p-3 rounded-full">
+                        <div class="bg-green-100 p-3 rounded-full summary-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                             </svg>
@@ -256,13 +575,13 @@
                     </div>
                 </div>
 
-                <div class="dashboard-card bg-white p-6">
+                <div class="dashboard-card bg-white p-6 summary-card" id="manhours-card">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Total Manhours</p>
                             <h3 class="text-2xl font-bold text-gray-800" id="total-manhours">Loading...</h3>
                         </div>
-                        <div class="bg-purple-100 p-3 rounded-full">
+                        <div class="bg-purple-100 p-3 rounded-full summary-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -279,13 +598,13 @@
                     </div>
                 </div>
 
-                <div class="dashboard-card bg-white p-6">
+                <div class="dashboard-card bg-white p-6 summary-card" id="productivity-card">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Productivity</p>
                             <h3 class="text-2xl font-bold text-gray-800" id="productivity-value">Loading...</h3>
                         </div>
-                        <div class="bg-amber-100 p-3 rounded-full">
+                        <div class="bg-amber-100 p-3 rounded-full summary-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
@@ -303,70 +622,118 @@
                 </div>
             </div>
 
+            <!-- Main Dashboard Cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Merged Card Carousel -->
+                <div class="dashboard-card bg-white lg:col-span-2">
+                    <div class="card-carousel" id="main-carousel">
+                        <!-- Daily Progress Report Slide -->
+                        <div class="carousel-slide" id="carousel-slide-1">
+                            <div class="carousel-title">
+                                <h3 class="text-lg font-semibold text-gray-800">Daily Progress Report</h3>
+                                <a href="#dpr-content" class="text-sm text-blue-600 hover:underline">View All</a>
+                            </div>
+                            <div class="carousel-content">
+                                <div class="space-y-4" id="dpr-summary">
+                                    <div class="flex justify-center items-center h-40">
+                                        <div class="loader"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="h-60">
+                                        <canvas id="dailyProgressChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Manpower Updates Slide -->
+                        <div class="carousel-slide" id="carousel-slide-2">
+                            <div class="carousel-title">
+                                <h3 class="text-lg font-semibold text-gray-800">Manpower Updates</h3>
+                                <a href="#manpower-content" class="text-sm text-blue-600 hover:underline">View All</a>
+                            </div>
+                            <div class="carousel-content">
+                                <div class="vertical-ticker-container" id="vertical-ticker-container">
+                                    <div class="vertical-ticker" id="vertical-ticker">
+                                        <!-- Will be populated by JavaScript -->
+                                        <div class="flex justify-center items-center h-40">
+                                            <div class="loader"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Productivity Overview Slide -->
+                        <div class="carousel-slide" id="carousel-slide-3">
+                            <div class="carousel-title">
+                                <h3 class="text-lg font-semibold text-gray-800">Productivity Overview</h3>
+                                <a href="#productivity-content" class="text-sm text-blue-600 hover:underline">View All</a>
+                            </div>
+                            <div class="carousel-content">
+                                <div class="space-y-4" id="productivity-summary">
+                                    <div class="flex justify-center items-center h-40">
+                                        <div class="loader"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="h-60">
+                                        <canvas id="productivitySummaryChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Carousel Indicators -->
+                        <div class="carousel-indicators">
+                            <div class="carousel-indicator active" data-slide="1"></div>
+                            <div class="carousel-indicator" data-slide="2"></div>
+                            <div class="carousel-indicator" data-slide="3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supervisor of the Month Card -->
+                <div class="dashboard-card bg-white p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">Supervisor of the Month</h3>
+                    <div class="flex flex-col items-center">
+                        <div class="supervisor-image-container float-animation">
+                            <img id="supervisor-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'%3E%3C/path%3E%3Ccircle cx='12' cy='7' r='4'%3E%3C/circle%3E%3C/svg%3E" alt="Supervisor of the Month" class="supervisor-image">
+                            <label for="image-upload" class="image-upload-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </label>
+                            <input type="file" id="image-upload" class="file-input" accept="image/*">
+                        </div>
+                        <input type="text" id="supervisor-name" class="supervisor-name-input" placeholder="Enter Supervisor Name" value="Gurwinder Singh">
+                    </div>
+                    <div class="mt-6">
+                        <h4 class="text-xl font-semibold text-blue-700 mb-2">Achievement Highlights</h4>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700" id="achievement-list">
+                            <li class="achievement-item">Highest productivity rate of 2.8 m³/hr</li>
+                            <li class="achievement-item">Completed 450 m³ of erection work</li>
+                            <li class="achievement-item">Managed a team of 15 workers with perfect safety record</li>
+                            <li class="achievement-item">Reduced material wastage by 15%</li>
+                            <li class="achievement-item">Completed all assigned tasks ahead of schedule</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- Tabs Navigation -->
             <div class="mb-6 border-b border-gray-200">
                 <div class="flex overflow-x-auto">
-                    <div class="tab tab-active" data-tab="overview">Overview</div>
-                    <div class="tab" data-tab="dpr">Daily Progress Report</div>
+                    <div class="tab tab-active" data-tab="dpr">Daily Progress Report</div>
                     <div class="tab" data-tab="manpower">Manpower</div>
                     <div class="tab" data-tab="productivity">Productivity</div>
                 </div>
             </div>
 
             <!-- Tab Content -->
-            <div class="content-section active" id="overview-content">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Performance Chart -->
-                    <div class="dashboard-card bg-white p-6 lg:col-span-2">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Daily Performance</h3>
-                        <div class="h-80">
-                            <canvas id="performanceChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Supervisor Performance -->
-                    <div class="dashboard-card bg-white p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Supervisor Performance</h3>
-                        <div class="space-y-4" id="supervisor-performance">
-                            <!-- Will be populated by JavaScript -->
-                            <div class="flex justify-center items-center h-40">
-                                <div class="loader"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Monthly Progress -->
-                    <div class="dashboard-card bg-white p-6 lg:col-span-3">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-gray-800">Monthly Progress</h3>
-                            <div class="flex space-x-2">
-                                <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm font-medium month-filter" data-month="7">July</button>
-                                <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm font-medium month-filter" data-month="8">August</button>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table class="min-w-full">
-                                <thead>
-                                    <tr>
-                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Date</th>
-                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Erection (m³)</th>
-                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Dismantling (m³)</th>
-                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Total Manhours</th>
-                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Target (m³)</th>
-                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Achieved (m³)</th>
-                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Achievement %</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="monthly-progress-table">
-                                    <!-- Will be populated by JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-section" id="dpr-content">
+            <div class="content-section active" id="dpr-content">
                 <div class="dashboard-card bg-white p-6">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h3 class="text-lg font-semibold text-gray-800">Daily Progress Report</h3>
@@ -554,6 +921,24 @@
         let performanceChart;
         let productivityChart;
         let weeklyProductivityChart;
+        let dailyProgressChart;
+        let productivitySummaryChart;
+
+        // Auto-refresh timer
+        let refreshInterval;
+        let refreshCountdown;
+        const REFRESH_INTERVAL = 60 * 60; // 1 hour in seconds
+
+        // Carousel variables
+        let carouselInterval;
+        let currentSlide = 1;
+        const CAROUSEL_INTERVAL = 10000; // 10 seconds per slide
+        const ANIMATION_EFFECTS = ['animate-fade-in', 'animate-slide-up', 'animate-scale-in', 'animate-rotate-in', 'animate-bounce-in', 'animate-slide-left', 'animate-slide-right'];
+
+        // Vertical ticker variables
+        let verticalTickerInterval;
+        let verticalTickerPosition = 0;
+        const VERTICAL_TICKER_INTERVAL = 3000; // 3 seconds per item
 
         // Function to fetch CSV data
         async function fetchCSV(url) {
@@ -666,6 +1051,12 @@
                 
                 // Update last updated time
                 document.getElementById('last-updated').textContent = new Date().toLocaleString();
+                
+                // Reset the refresh countdown
+                resetRefreshCountdown();
+                
+                // Apply animations to summary cards
+                animateSummaryCards();
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('loading-overlay').style.display = 'none';
@@ -678,40 +1069,45 @@
             // Update summary cards
             updateSummaryCards();
             
-            // Update DPR table
+            // Update DPR table and summary
             updateDPRTable();
+            updateDPRSummary();
             
-            // Update Manpower table and attendance cards
+            // Update Manpower table, attendance cards, and ticker
             updateManpowerTable();
+            updateManpowerTicker();
+            updateVerticalManpowerTicker();
             
-            // Update Productivity table
+            // Update Productivity table and summary
             updateProductivityTable();
-            
-            // Update Monthly Progress table
-            updateMonthlyProgressTable();
-            
-            // Update Supervisor Performance
-            updateSupervisorPerformance();
+            updateProductivitySummary();
             
             // Update charts
             updateCharts();
             
             // Set up filters
             setupFilters();
+            
+            // Start the carousel
+            startCarousel();
+            
+            // Start the vertical ticker
+            startVerticalTicker();
+            
+            // Apply animations to achievement items
+            animateAchievementItems();
         }
 
         // Function to update summary cards
         function updateSummaryCards() {
-            // Calculate total erection
-            const totalErection = overallData.reduce((sum, item) => sum + parseNumeric(item.erection), 0);
+            // Calculate totals from productivity data
+            const totalErection = productivityData.reduce((sum, item) => sum + parseNumeric(item.erection), 0);
             document.getElementById('total-erection').textContent = totalErection.toFixed(2) + ' m³';
             
-            // Calculate total dismantling
-            const totalDismantling = overallData.reduce((sum, item) => sum + parseNumeric(item.dismantling), 0);
+            const totalDismantling = productivityData.reduce((sum, item) => sum + parseNumeric(item.dismantling), 0);
             document.getElementById('total-dismantling').textContent = totalDismantling.toFixed(2) + ' m³';
             
-            // Calculate total manhours
-            const totalManhours = overallData.reduce((sum, item) => sum + parseNumeric(item.totalManhours), 0);
+            const totalManhours = productivityData.reduce((sum, item) => sum + parseNumeric(item.totalManhours), 0);
             document.getElementById('total-manhours').textContent = totalManhours.toFixed(0) + ' hrs';
             
             // Calculate average productivity
@@ -742,6 +1138,34 @@
             document.getElementById('productivity-progress-bar').style.width = Math.min(100, productivityProgress) + '%';
         }
 
+        // Function to animate summary cards
+        function animateSummaryCards() {
+            const cards = document.querySelectorAll('.summary-card');
+            
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add(ANIMATION_EFFECTS[index % ANIMATION_EFFECTS.length]);
+                    
+                    // Add pulse animation to the icon
+                    const icon = card.querySelector('.summary-icon');
+                    if (icon) {
+                        icon.classList.add('pulse-animation');
+                    }
+                }, index * 200);
+            });
+        }
+
+        // Function to animate achievement items
+        function animateAchievementItems() {
+            const items = document.querySelectorAll('.achievement-item');
+            
+            items.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.add('animate-slide-right');
+                }, index * 200);
+            });
+        }
+
         // Function to update DPR table
         function updateDPRTable() {
             const dprTable = document.getElementById('dpr-table');
@@ -754,8 +1178,9 @@
                 return;
             }
             
-            dprData.forEach(item => {
+            dprData.forEach((item, index) => {
                 const row = document.createElement('tr');
+                row.className = 'opacity-0';
                 row.innerHTML = `
                     <td class="px-4 py-3 text-sm">${item.date || ''}</td>
                     <td class="px-4 py-3 text-sm">${item.supervisor || ''}</td>
@@ -767,6 +1192,12 @@
                     <td class="px-4 py-3 text-sm font-medium">${item.volume?.toFixed(2) || '0.00'}</td>
                 `;
                 dprTable.appendChild(row);
+                
+                // Animate row appearance with delay
+                setTimeout(() => {
+                    row.classList.add('animate-fade-in');
+                    row.classList.remove('opacity-0');
+                }, index * 50);
             });
             
             // Populate supervisor filter
@@ -789,6 +1220,156 @@
             }
         }
 
+        // Function to update DPR Summary
+        function updateDPRSummary() {
+            const dprSummary = document.getElementById('dpr-summary');
+            dprSummary.innerHTML = '';
+            
+            if (dprData.length === 0) {
+                dprSummary.innerHTML = '<div class="flex justify-center items-center h-40"><p>No data available</p></div>';
+                return;
+            }
+            
+            // Get the most recent date
+            const dates = dprData.map(item => item.date).filter(Boolean);
+            const latestDate = new Date(Math.max(...dates.map(date => new Date(date))));
+            const latestDateStr = latestDate.toISOString().split('T')[0];
+            
+            // Filter data for the latest date
+            const latestData = dprData.filter(item => item.date === latestDateStr);
+            
+            // Calculate totals for the latest date
+            const totalErection = latestData
+                .filter(item => item.workType === 'ERECTION')
+                .reduce((sum, item) => sum + parseNumeric(item.volume), 0);
+                
+            const totalDismantling = latestData
+                .filter(item => item.workType === 'DISMANTLING')
+                .reduce((sum, item) => sum + parseNumeric(item.volume), 0);
+            
+            // Create summary elements with animation classes
+            const dateElement = document.createElement('div');
+            dateElement.className = 'text-sm text-gray-500 mb-2 opacity-0';
+            dateElement.textContent = `Latest Data: ${new Date(latestDateStr).toLocaleDateString()}`;
+            
+            const erectionElement = document.createElement('div');
+            erectionElement.className = 'flex justify-between items-center mb-2 opacity-0';
+            erectionElement.innerHTML = `
+                <span class="font-medium">Erection:</span>
+                <span class="text-blue-600 font-semibold">${totalErection.toFixed(2)} m³</span>
+            `;
+            
+            const dismantlingElement = document.createElement('div');
+            dismantlingElement.className = 'flex justify-between items-center mb-2 opacity-0';
+            dismantlingElement.innerHTML = `
+                <span class="font-medium">Dismantling:</span>
+                <span class="text-green-600 font-semibold">${totalDismantling.toFixed(2)} m³</span>
+            `;
+            
+            const totalElement = document.createElement('div');
+            totalElement.className = 'flex justify-between items-center pt-2 border-t border-gray-200 opacity-0';
+            totalElement.innerHTML = `
+                <span class="font-medium">Total Volume:</span>
+                <span class="text-purple-600 font-semibold">${(totalErection + totalDismantling).toFixed(2)} m³</span>
+            `;
+            
+            // Append elements to summary
+            dprSummary.appendChild(dateElement);
+            dprSummary.appendChild(erectionElement);
+            dprSummary.appendChild(dismantlingElement);
+            dprSummary.appendChild(totalElement);
+            
+            // Apply animations with delay
+            setTimeout(() => {
+                dateElement.classList.add('animate-fade-in');
+                dateElement.classList.remove('opacity-0');
+            }, 100);
+            
+            setTimeout(() => {
+                erectionElement.classList.add('animate-slide-right');
+                erectionElement.classList.remove('opacity-0');
+            }, 300);
+            
+            setTimeout(() => {
+                dismantlingElement.classList.add('animate-slide-right');
+                dismantlingElement.classList.remove('opacity-0');
+            }, 500);
+            
+            setTimeout(() => {
+                totalElement.classList.add('animate-slide-up');
+                totalElement.classList.remove('opacity-0');
+            }, 700);
+            
+            // Update Daily Progress Chart
+            updateDailyProgressChart();
+        }
+
+        // Function to update Daily Progress Chart
+        function updateDailyProgressChart() {
+            const ctx = document.getElementById('dailyProgressChart').getContext('2d');
+            
+            // Get the last 7 days of data
+            const sortedData = [...overallData]
+                .filter(item => item.date)
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .slice(-7);
+            
+            if (dailyProgressChart) {
+                dailyProgressChart.destroy();
+            }
+            
+            dailyProgressChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedData.map(item => {
+                        const date = new Date(item.date);
+                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    }),
+                    datasets: [
+                        {
+                            label: 'Erection',
+                            data: sortedData.map(item => item.erection),
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Dismantling',
+                            data: sortedData.map(item => item.dismantling),
+                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Volume (m³)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
         // Function to update Manpower table and attendance cards
         function updateManpowerTable() {
             const manpowerTable = document.getElementById('manpower-table');
@@ -801,8 +1382,9 @@
                 return;
             }
             
-            manpowerData.forEach(item => {
+            manpowerData.forEach((item, index) => {
                 const row = document.createElement('tr');
+                row.className = 'opacity-0';
                 const status = parseNumeric(item.totalManhours) > 8 ? 
                     `<span class="status-badge status-overtime">Present + OT</span>` : 
                     `<span class="status-badge status-present">Present</span>`;
@@ -816,6 +1398,12 @@
                     <td class="px-4 py-3 text-sm">${status}</td>
                 `;
                 manpowerTable.appendChild(row);
+                
+                // Animate row appearance with delay
+                setTimeout(() => {
+                    row.classList.add('animate-fade-in');
+                    row.classList.remove('opacity-0');
+                }, index * 50);
             });
             
             // Update attendance cards
@@ -851,9 +1439,9 @@
                 return;
             }
             
-            manpowerData.forEach(item => {
+            manpowerData.forEach((item, index) => {
                 const card = document.createElement('div');
-                card.className = 'attendance-card bg-white rounded-lg shadow-md p-4 flex flex-col';
+                card.className = 'attendance-card bg-white rounded-lg shadow-md p-4 flex flex-col opacity-0';
                 
                 const status = parseNumeric(item.totalManhours) > 8 ? 
                     `<span class="status-badge status-overtime">Present + OT</span>` : 
@@ -880,7 +1468,164 @@
                     </div>
                 `;
                 attendanceSlider.appendChild(card);
+                
+                // Animate card appearance with delay
+                setTimeout(() => {
+                    card.classList.add(ANIMATION_EFFECTS[index % ANIMATION_EFFECTS.length]);
+                    card.classList.remove('opacity-0');
+                }, index * 100);
             });
+        }
+
+        // Function to update Manpower Ticker
+        function updateManpowerTicker() {
+            const tickerItems = document.getElementById('manpower-ticker-items');
+            if (!tickerItems) return;
+            
+            tickerItems.innerHTML = '';
+            
+            if (manpowerData.length === 0) {
+                tickerItems.innerHTML = '<div class="flex justify-center items-center h-40"><p>No manpower data available</p></div>';
+                return;
+            }
+            
+            // Get the most recent date
+            const dates = manpowerData.map(item => item.date).filter(Boolean);
+            const latestDate = new Date(Math.max(...dates.map(date => new Date(date))));
+            const latestDateStr = latestDate.toISOString().split('T')[0];
+            
+            // Filter data for the latest date
+            const latestData = manpowerData.filter(item => item.date === latestDateStr);
+            
+            // Create ticker items
+            latestData.forEach((item, index) => {
+                const tickerItem = document.createElement('div');
+                tickerItem.className = 'manpower-ticker-item p-4 mb-4 bg-white rounded-lg shadow-sm opacity-0';
+                
+                const status = parseNumeric(item.totalManhours) > 8 ? 
+                    `<span class="status-badge status-overtime">Present + OT</span>` : 
+                    `<span class="status-badge status-present">Present</span>`;
+                
+                tickerItem.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-gray-800">${item.empName || 'Unknown'}</h4>
+                        ${status}
+                    </div>
+                    <p class="text-sm text-gray-600">Supervisor: ${item.supervisor || ''}</p>
+                    <div class="mt-3">
+                        <div class="flex justify-between text-xs text-gray-600 mb-1">
+                            <span>Hours</span>
+                            <span>${item.totalManhours || '0'} hrs</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-value ${parseNumeric(item.totalManhours) > 8 ? 'bg-amber-500' : 'bg-green-500'}" 
+                                style="width: ${(parseNumeric(item.totalManhours) / 12) * 100}%"></div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Date: ${item.date || ''}</p>
+                `;
+                
+                // Add animation with delay based on index
+                setTimeout(() => {
+                    tickerItem.classList.add(ANIMATION_EFFECTS[index % ANIMATION_EFFECTS.length]);
+                    tickerItem.classList.remove('opacity-0');
+                }, index * 100);
+                
+                tickerItems.appendChild(tickerItem);
+            });
+        }
+
+        // Function to update Vertical Manpower Ticker
+        function updateVerticalManpowerTicker() {
+            const verticalTicker = document.getElementById('vertical-ticker');
+            verticalTicker.innerHTML = '';
+            
+            if (manpowerData.length === 0) {
+                verticalTicker.innerHTML = '<div class="flex justify-center items-center h-40"><p>No manpower data available</p></div>';
+                return;
+            }
+            
+            // Get the most recent date
+            const dates = manpowerData.map(item => item.date).filter(Boolean);
+            const latestDate = new Date(Math.max(...dates.map(date => new Date(date))));
+            const latestDateStr = latestDate.toISOString().split('T')[0];
+            
+            // Filter data for the latest date
+            const latestData = manpowerData.filter(item => item.date === latestDateStr);
+            
+            // Create ticker items
+            latestData.forEach((item, index) => {
+                const tickerItem = document.createElement('div');
+                tickerItem.className = 'vertical-ticker-item';
+                tickerItem.setAttribute('data-index', index);
+                
+                const status = parseNumeric(item.totalManhours) > 8 ? 
+                    `<span class="status-badge status-overtime">Present + OT</span>` : 
+                    `<span class="status-badge status-present">Present</span>`;
+                
+                tickerItem.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="font-semibold text-gray-800">${item.empName || 'Unknown'}</h4>
+                            <p class="text-xs text-gray-500">Supervisor: ${item.supervisor || ''}</p>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            ${status}
+                            <span class="text-sm font-medium mt-1">${item.totalManhours || '0'} hrs</span>
+                        </div>
+                    </div>
+                `;
+                
+                verticalTicker.appendChild(tickerItem);
+            });
+            
+            // Set the height of each ticker item
+            const tickerItems = verticalTicker.querySelectorAll('.vertical-ticker-item');
+            const itemHeight = 80; // Fixed height for each item
+            
+            tickerItems.forEach(item => {
+                item.style.height = `${itemHeight}px`;
+            });
+            
+            // Set the total height of the ticker
+            verticalTicker.style.height = `${tickerItems.length * itemHeight}px`;
+        }
+
+        // Function to start the vertical ticker
+        function startVerticalTicker() {
+            // Clear any existing interval
+            if (verticalTickerInterval) {
+                clearInterval(verticalTickerInterval);
+            }
+            
+            const verticalTicker = document.getElementById('vertical-ticker');
+            const tickerContainer = document.getElementById('vertical-ticker-container');
+            
+            if (!verticalTicker || !tickerContainer) return;
+            
+            const tickerItems = verticalTicker.querySelectorAll('.vertical-ticker-item');
+            if (tickerItems.length === 0) return;
+            
+            const itemHeight = 80; // Fixed height for each item
+            let currentIndex = 0;
+            
+            // Show the first item
+            verticalTicker.style.transform = `translateY(0)`;
+            
+            // Start the interval
+            verticalTickerInterval = setInterval(() => {
+                currentIndex = (currentIndex + 1) % tickerItems.length;
+                verticalTicker.style.transform = `translateY(-${currentIndex * itemHeight}px)`;
+                
+                // Apply animation to the current item
+                tickerItems.forEach(item => {
+                    item.classList.remove('bg-blue-50');
+                });
+                
+                if (tickerItems[currentIndex]) {
+                    tickerItems[currentIndex].classList.add('bg-blue-50');
+                }
+            }, VERTICAL_TICKER_INTERVAL);
         }
 
         // Function to update Productivity table
@@ -895,8 +1640,9 @@
                 return;
             }
             
-            productivityData.forEach(item => {
+            productivityData.forEach((item, index) => {
                 const row = document.createElement('tr');
+                row.className = 'opacity-0';
                 const productivityValue = isNaN(item.productivity) || item.productivity === null ? 
                     'N/A' : item.productivity.toFixed(2);
                 
@@ -909,60 +1655,22 @@
                     <td class="px-4 py-3 text-sm font-medium ${parseNumeric(item.productivity) > 0 ? 'text-green-600' : 'text-gray-500'}">${productivityValue}</td>
                 `;
                 productivityTable.appendChild(row);
+                
+                // Animate row appearance with delay
+                setTimeout(() => {
+                    row.classList.add('animate-fade-in');
+                    row.classList.remove('opacity-0');
+                }, index * 50);
             });
         }
 
-        // Function to update Monthly Progress table
-        function updateMonthlyProgressTable(month = null) {
-            const monthlyProgressTable = document.getElementById('monthly-progress-table');
-            monthlyProgressTable.innerHTML = '';
-            
-            let filteredData = [...overallData];
-            
-            // Filter by month if specified
-            if (month !== null) {
-                filteredData = filteredData.filter(item => {
-                    if (!item.date) return false;
-                    const date = new Date(item.date);
-                    return date.getMonth() + 1 === month;
-                });
-            }
-            
-            if (filteredData.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="7" class="text-center py-4">No data available for the selected month</td>`;
-                monthlyProgressTable.appendChild(row);
-                return;
-            }
-            
-            filteredData.forEach(item => {
-                const row = document.createElement('tr');
-                const achievementPercent = parseNumeric(item.target) > 0 ? 
-                    ((parseNumeric(item.achieved) / parseNumeric(item.target)) * 100).toFixed(1) : 'N/A';
-                
-                const achievementClass = achievementPercent >= 100 ? 'text-green-600' : 
-                                        (achievementPercent >= 80 ? 'text-amber-600' : 'text-red-600');
-                
-                row.innerHTML = `
-                    <td class="px-4 py-3 text-sm">${item.date || ''}</td>
-                    <td class="px-4 py-3 text-sm">${item.erection?.toFixed(2) || '0.00'}</td>
-                    <td class="px-4 py-3 text-sm">${item.dismantling?.toFixed(2) || '0.00'}</td>
-                    <td class="px-4 py-3 text-sm">${item.totalManhours || '0'}</td>
-                    <td class="px-4 py-3 text-sm">${item.target?.toFixed(2) || '0.00'}</td>
-                    <td class="px-4 py-3 text-sm">${item.achieved?.toFixed(2) || '0.00'}</td>
-                    <td class="px-4 py-3 text-sm font-medium ${achievementClass}">${achievementPercent !== 'N/A' ? achievementPercent + '%' : achievementPercent}</td>
-                `;
-                monthlyProgressTable.appendChild(row);
-            });
-        }
-
-        // Function to update Supervisor Performance
-        function updateSupervisorPerformance() {
-            const supervisorPerformance = document.getElementById('supervisor-performance');
-            supervisorPerformance.innerHTML = '';
+        // Function to update Productivity Summary
+        function updateProductivitySummary() {
+            const productivitySummary = document.getElementById('productivity-summary');
+            productivitySummary.innerHTML = '';
             
             if (productivityData.length === 0) {
-                supervisorPerformance.innerHTML = '<div class="flex justify-center items-center h-40"><p>No productivity data available</p></div>';
+                productivitySummary.innerHTML = '<div class="flex justify-center items-center h-40"><p>No productivity data available</p></div>';
                 return;
             }
             
@@ -973,27 +1681,146 @@
             
             // If no valid productivity data
             if (sortedData.length === 0) {
-                supervisorPerformance.innerHTML = '<div class="flex justify-center items-center h-40"><p>No valid productivity data available</p></div>';
+                productivitySummary.innerHTML = '<div class="flex justify-center items-center h-40"><p>No valid productivity data available</p></div>';
                 return;
             }
             
-            // Get the highest productivity for scaling
-            const maxProductivity = Math.max(...sortedData.map(item => item.productivity));
+            // Get the top performer
+            const topPerformer = sortedData[0];
             
-            sortedData.forEach(item => {
-                const percentage = (item.productivity / maxProductivity) * 100;
-                
-                const div = document.createElement('div');
-                div.innerHTML = `
-                    <div class="flex justify-between mb-1">
-                        <span class="text-sm font-medium text-gray-700">${item.supervisor}</span>
-                        <span class="text-sm font-medium text-blue-700">${item.productivity.toFixed(2)}</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-value bg-blue-500" style="width: ${percentage}%"></div>
-                    </div>
-                `;
-                supervisorPerformance.appendChild(div);
+            // Create summary elements with animation classes
+            const topElement = document.createElement('div');
+            topElement.className = 'text-sm text-gray-500 mb-2 opacity-0';
+            topElement.textContent = 'Top Performer:';
+            
+            const nameElement = document.createElement('div');
+            nameElement.className = 'text-lg font-semibold text-blue-700 mb-2 opacity-0';
+            nameElement.textContent = topPerformer.supervisor;
+            
+            const productivityElement = document.createElement('div');
+            productivityElement.className = 'flex justify-between items-center mb-2 opacity-0';
+            productivityElement.innerHTML = `
+                <span class="font-medium">Productivity:</span>
+                <span class="text-green-600 font-semibold">${topPerformer.productivity.toFixed(2)} m³/hr</span>
+            `;
+            
+            const volumeElement = document.createElement('div');
+            volumeElement.className = 'flex justify-between items-center mb-2 opacity-0';
+            volumeElement.innerHTML = `
+                <span class="font-medium">Total Volume:</span>
+                <span class="text-blue-600 font-semibold">${topPerformer.equivalent.toFixed(2)} m³</span>
+            `;
+            
+            const hoursElement = document.createElement('div');
+            hoursElement.className = 'flex justify-between items-center opacity-0';
+            hoursElement.innerHTML = `
+                <span class="font-medium">Total Hours:</span>
+                <span class="text-purple-600 font-semibold">${topPerformer.totalManhours.toFixed(1)} hrs</span>
+            `;
+            
+            // Append elements to summary
+            productivitySummary.appendChild(topElement);
+            productivitySummary.appendChild(nameElement);
+            productivitySummary.appendChild(productivityElement);
+            productivitySummary.appendChild(volumeElement);
+            productivitySummary.appendChild(hoursElement);
+            
+            // Apply animations with delay
+            setTimeout(() => {
+                topElement.classList.add('animate-fade-in');
+                topElement.classList.remove('opacity-0');
+            }, 100);
+            
+            setTimeout(() => {
+                nameElement.classList.add('animate-slide-up');
+                nameElement.classList.remove('opacity-0');
+            }, 300);
+            
+            setTimeout(() => {
+                productivityElement.classList.add('animate-slide-right');
+                productivityElement.classList.remove('opacity-0');
+            }, 500);
+            
+            setTimeout(() => {
+                volumeElement.classList.add('animate-slide-right');
+                volumeElement.classList.remove('opacity-0');
+            }, 700);
+            
+            setTimeout(() => {
+                hoursElement.classList.add('animate-slide-right');
+                hoursElement.classList.remove('opacity-0');
+            }, 900);
+            
+            // Update Productivity Summary Chart
+            updateProductivitySummaryChart();
+        }
+
+        // Function to update Productivity Summary Chart
+        function updateProductivitySummaryChart() {
+            const ctx = document.getElementById('productivitySummaryChart').getContext('2d');
+            
+            // Filter and sort data
+            const chartData = [...productivityData]
+                .filter(item => item.productivity > 0)
+                .sort((a, b) => b.productivity - a.productivity)
+                .slice(0, 5); // Top 5 performers
+            
+            if (productivitySummaryChart) {
+                productivitySummaryChart.destroy();
+            }
+            
+            productivitySummaryChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.map(item => item.supervisor),
+                    datasets: [
+                        {
+                            label: 'Productivity (m³/hr)',
+                            data: chartData.map(item => item.productivity),
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(16, 185, 129, 0.7)',
+                                'rgba(245, 158, 11, 0.7)',
+                                'rgba(139, 92, 246, 0.7)',
+                                'rgba(236, 72, 153, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(16, 185, 129, 1)',
+                                'rgba(245, 158, 11, 1)',
+                                'rgba(139, 92, 246, 1)',
+                                'rgba(236, 72, 153, 1)'
+                            ],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Productivity (m³/hr)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Top Performers'
+                        }
+                    }
+                }
             });
         }
 
@@ -1011,7 +1838,8 @@
 
         // Function to update Performance Chart
         function updatePerformanceChart() {
-            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const ctx = document.getElementById('performanceChart')?.getContext('2d');
+            if (!ctx) return;
             
             // Sort data by date
             const sortedData = [...overallData]
@@ -1028,7 +1856,10 @@
             performanceChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: chartData.map(item => item.date),
+                    labels: chartData.map(item => {
+                        const date = new Date(item.date);
+                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    }),
                     datasets: [
                         {
                             label: 'Erection',
@@ -1059,6 +1890,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -1089,7 +1924,8 @@
 
         // Function to update Productivity Comparison Chart
         function updateProductivityComparisonChart() {
-            const ctx = document.getElementById('productivityChart').getContext('2d');
+            const ctx = document.getElementById('productivityChart')?.getContext('2d');
+            if (!ctx) return;
             
             // Filter and sort data
             const chartData = [...productivityData]
@@ -1133,6 +1969,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -1153,7 +1993,8 @@
 
         // Function to update Weekly Productivity Chart
         function updateWeeklyProductivityChart() {
-            const ctx = document.getElementById('weeklyProductivityChart').getContext('2d');
+            const ctx = document.getElementById('weeklyProductivityChart')?.getContext('2d');
+            if (!ctx) return;
             
             // Group data by week
             const weeklyData = groupDataByWeek(overallData);
@@ -1190,6 +2031,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -1301,8 +2146,9 @@
                     return;
                 }
                 
-                filteredData.forEach(item => {
+                filteredData.forEach((item, index) => {
                     const row = document.createElement('tr');
+                    row.className = 'opacity-0';
                     row.innerHTML = `
                         <td class="px-4 py-3 text-sm">${item.date || ''}</td>
                         <td class="px-4 py-3 text-sm">${item.supervisor || ''}</td>
@@ -1314,6 +2160,12 @@
                         <td class="px-4 py-3 text-sm font-medium">${item.volume?.toFixed(2) || '0.00'}</td>
                     `;
                     dprTable.appendChild(row);
+                    
+                    // Animate row appearance with delay
+                    setTimeout(() => {
+                        row.classList.add('animate-fade-in');
+                        row.classList.remove('opacity-0');
+                    }, index * 50);
                 });
             }
             
@@ -1353,8 +2205,9 @@
                     return;
                 }
                 
-                filteredData.forEach(item => {
+                filteredData.forEach((item, index) => {
                     const row = document.createElement('tr');
+                    row.className = 'opacity-0';
                     const status = parseNumeric(item.totalManhours) > 8 ? 
                         `<span class="status-badge status-overtime">Present + OT</span>` : 
                         `<span class="status-badge status-present">Present</span>`;
@@ -1368,15 +2221,21 @@
                         <td class="px-4 py-3 text-sm">${status}</td>
                     `;
                     manpowerTable.appendChild(row);
+                    
+                    // Animate row appearance with delay
+                    setTimeout(() => {
+                        row.classList.add('animate-fade-in');
+                        row.classList.remove('opacity-0');
+                    }, index * 50);
                 });
                 
                 // Update attendance cards with filtered data
                 const attendanceSlider = document.getElementById('attendance-slider');
                 attendanceSlider.innerHTML = '';
                 
-                filteredData.forEach(item => {
+                filteredData.forEach((item, index) => {
                     const card = document.createElement('div');
-                    card.className = 'attendance-card bg-white rounded-lg shadow-md p-4 flex flex-col';
+                    card.className = 'attendance-card bg-white rounded-lg shadow-md p-4 flex flex-col opacity-0';
                     
                     const status = parseNumeric(item.totalManhours) > 8 ? 
                         `<span class="status-badge status-overtime">Present + OT</span>` : 
@@ -1403,31 +2262,17 @@
                         </div>
                     `;
                     attendanceSlider.appendChild(card);
+                    
+                    // Animate card appearance with delay
+                    setTimeout(() => {
+                        card.classList.add(ANIMATION_EFFECTS[index % ANIMATION_EFFECTS.length]);
+                        card.classList.remove('opacity-0');
+                    }, index * 100);
                 });
             }
             
             manpowerDateFilter.addEventListener('change', filterManpowerData);
             manpowerSupervisorFilter.addEventListener('change', filterManpowerData);
-            
-            // Month filter for Monthly Progress
-            const monthFilters = document.querySelectorAll('.month-filter');
-            monthFilters.forEach(button => {
-                button.addEventListener('click', function() {
-                    // Remove active class from all buttons
-                    monthFilters.forEach(btn => {
-                        btn.classList.remove('bg-blue-100', 'text-blue-700');
-                        btn.classList.add('bg-gray-100', 'text-gray-700');
-                    });
-                    
-                    // Add active class to clicked button
-                    this.classList.remove('bg-gray-100', 'text-gray-700');
-                    this.classList.add('bg-blue-100', 'text-blue-700');
-                    
-                    // Update table with selected month
-                    const month = parseInt(this.getAttribute('data-month'));
-                    updateMonthlyProgressTable(month);
-                });
-            });
         }
 
         // Attendance slider navigation
@@ -1458,29 +2303,232 @@
                 // Add active class to clicked tab and corresponding content section
                 tab.classList.add('tab-active');
                 document.getElementById(`${tabId}-content`).classList.add('active');
+                
+                // Apply entrance animation to the content section
+                const activeSection = document.getElementById(`${tabId}-content`);
+                activeSection.classList.add('animate-fade-in');
+                
+                // Refresh charts if needed
+                if (tabId === 'productivity') {
+                    setTimeout(() => {
+                        updateProductivityComparisonChart();
+                        updateWeeklyProductivityChart();
+                    }, 100);
+                }
             });
         });
 
         // Refresh button functionality
         document.getElementById('refresh-btn').addEventListener('click', () => {
+            // Add animation to the button
+            const refreshBtn = document.getElementById('refresh-btn');
+            refreshBtn.classList.add('animate-bounce-in');
+            
+            // Remove animation after it completes
+            setTimeout(() => {
+                refreshBtn.classList.remove('animate-bounce-in');
+            }, 800);
+            
             loadAllData();
         });
 
-        // Auto-refresh data every 5 minutes
-        function setupAutoRefresh() {
-            setInterval(() => {
+        // Function to format time as MM:SS
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Function to update the refresh countdown timer
+        function updateRefreshTimer() {
+            const timerElement = document.getElementById('refresh-timer');
+            refreshCountdown--;
+            
+            if (refreshCountdown <= 0) {
+                // Time to refresh
                 loadAllData();
-            }, 5 * 60 * 1000); // 5 minutes
+                resetRefreshCountdown();
+            } else {
+                // Update the timer display
+                timerElement.textContent = `Auto-refresh in ${formatTime(refreshCountdown)}`;
+            }
+        }
+
+        // Function to reset the refresh countdown
+        function resetRefreshCountdown() {
+            refreshCountdown = REFRESH_INTERVAL;
+            const timerElement = document.getElementById('refresh-timer');
+            timerElement.textContent = `Auto-refresh in ${formatTime(refreshCountdown)}`;
+        }
+
+        // Function to setup auto-refresh
+        function setupAutoRefresh() {
+            // Clear any existing interval
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            
+            // Initialize countdown
+            resetRefreshCountdown();
+            
+            // Set up the interval to update every second
+            refreshInterval = setInterval(updateRefreshTimer, 1000);
+        }
+
+        // Supervisor of the Month image upload
+        document.getElementById('image-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('supervisor-image').src = e.target.result;
+                    // Store the image in localStorage
+                    localStorage.setItem('supervisorImage', e.target.result);
+                    
+                    // Add animation to the image container
+                    const imageContainer = document.querySelector('.supervisor-image-container');
+                    imageContainer.classList.add('animate-bounce-in');
+                    
+                    // Remove animation after it completes
+                    setTimeout(() => {
+                        imageContainer.classList.remove('animate-bounce-in');
+                    }, 800);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Save supervisor name when changed
+        document.getElementById('supervisor-name').addEventListener('change', function(event) {
+            localStorage.setItem('supervisorName', this.value);
+            
+            // Add animation to the name input
+            this.classList.add('animate-scale-in');
+            
+            // Remove animation after it completes
+            setTimeout(() => {
+                this.classList.remove('animate-scale-in');
+            }, 500);
+        });
+
+        // Load supervisor data from localStorage
+        function loadSupervisorData() {
+            const savedImage = localStorage.getItem('supervisorImage');
+            if (savedImage) {
+                document.getElementById('supervisor-image').src = savedImage;
+            }
+            
+            const savedName = localStorage.getItem('supervisorName');
+            if (savedName) {
+                document.getElementById('supervisor-name').value = savedName;
+            }
+        }
+
+        // Carousel functionality
+        function startCarousel() {
+            // Clear any existing interval
+            if (carouselInterval) {
+                clearInterval(carouselInterval);
+            }
+            
+            // Set initial slide
+            showSlide(currentSlide);
+            
+            // Set up carousel indicators
+            const indicators = document.querySelectorAll('.carousel-indicator');
+            indicators.forEach(indicator => {
+                indicator.addEventListener('click', function() {
+                    const slideNumber = parseInt(this.getAttribute('data-slide'));
+                    showSlide(slideNumber);
+                    resetCarouselInterval();
+                });
+            });
+            
+            // Start the interval
+            carouselInterval = setInterval(() => {
+                currentSlide = currentSlide >= 3 ? 1 : currentSlide + 1;
+                showSlide(currentSlide);
+            }, CAROUSEL_INTERVAL);
+        }
+
+        // Function to show a specific slide
+        function showSlide(slideNumber) {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const indicators = document.querySelectorAll('.carousel-indicator');
+            
+            // Hide all slides
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+                slide.classList.remove('prev');
+            });
+            
+            // Remove active class from all indicators
+            indicators.forEach(indicator => {
+                indicator.classList.remove('active');
+            });
+            
+            // Show the selected slide
+            const currentSlideElement = document.getElementById(`carousel-slide-${slideNumber}`);
+            currentSlideElement.classList.add('active');
+            
+            // Mark the previous slide
+            const prevSlideNumber = slideNumber === 1 ? 3 : slideNumber - 1;
+            const prevSlideElement = document.getElementById(`carousel-slide-${prevSlideNumber}`);
+            prevSlideElement.classList.add('prev');
+            
+            // Update the indicator
+            indicators[slideNumber - 1].classList.add('active');
+            
+            // Update current slide variable
+            currentSlide = slideNumber;
+            
+            // Apply animation effect based on slide content
+            applyAnimationEffect(currentSlideElement, slideNumber);
+        }
+
+        // Function to apply animation effect to slide content
+        function applyAnimationEffect(slideElement, slideNumber) {
+            // Get the content elements
+            const contentElements = slideElement.querySelectorAll('.carousel-content > *');
+            
+            // Remove any existing animation classes
+            contentElements.forEach(element => {
+                ANIMATION_EFFECTS.forEach(effect => {
+                    element.classList.remove(effect);
+                });
+            });
+            
+            // Apply new animation with delay
+            contentElements.forEach((element, index) => {
+                setTimeout(() => {
+                    // Use different animation effect based on slide number
+                    const effectIndex = (slideNumber - 1) % ANIMATION_EFFECTS.length;
+                    element.classList.add(ANIMATION_EFFECTS[effectIndex]);
+                }, index * 100);
+            });
+        }
+
+        // Function to reset the carousel interval
+        function resetCarouselInterval() {
+            if (carouselInterval) {
+                clearInterval(carouselInterval);
+            }
+            
+            carouselInterval = setInterval(() => {
+                currentSlide = currentSlide >= 3 ? 1 : currentSlide + 1;
+                showSlide(currentSlide);
+            }, CAROUSEL_INTERVAL);
         }
 
         // Initialize the dashboard
         function init() {
             loadAllData();
             setupAutoRefresh();
+            loadSupervisorData();
         }
 
         // Start the dashboard
         init();
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'966a671463ecde58',t:'MTc1Mzc2ODg5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
