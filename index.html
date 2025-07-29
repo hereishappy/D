@@ -3,124 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Construction Operations Dashboard</title>
+    <title>CDH Data Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
         }
         
-        .dashboard {
-            max-width: 1400px;
-            margin: 0 auto;
+        .dashboard-card {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
         
-        .header {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            margin-bottom: 25px;
-            text-align: center;
+        .dashboard-card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
         }
         
-        .header h1 {
-            color: #2d3748;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            color: #718096;
-            font-size: 1.1rem;
-        }
-        
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-        
-        .metric-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-        
-        .metric-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .metric-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .metric-label {
-            color: #718096;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .erection { color: #48bb78; }
-        .dismantling { color: #ed8936; }
-        .productivity { color: #667eea; }
-        .manpower { color: #9f7aea; }
-        
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-        
-        .chart-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        }
-        
-        .chart-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .data-table {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .table-header {
-            background: #4a5568;
-            color: white;
-            padding: 20px 25px;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        
-        .table-content {
+        .table-container {
+            overflow-x: auto;
             max-height: 400px;
             overflow-y: auto;
         }
@@ -130,753 +39,1448 @@
             border-collapse: collapse;
         }
         
+        th {
+            background-color: #1e40af;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
         }
         
-        th {
-            background: #f7fafc;
-            font-weight: 600;
-            color: #4a5568;
-            position: sticky;
-            top: 0;
+        tbody tr:hover {
+            background-color: #f1f5f9;
         }
         
-        tr:hover {
-            background: #f7fafc;
+        .attendance-card {
+            min-width: 220px;
+            transition: transform 0.3s ease;
         }
         
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .erection-badge {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-        
-        .dismantling-badge {
-            background: #fed7aa;
-            color: #9c4221;
-        }
-        
-        .tabs {
+        .attendance-slider {
             display: flex;
-            background: white;
-            border-radius: 15px;
-            padding: 5px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e2e8f0;
+            overflow: hidden;
+        }
+        
+        .progress-value {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #3b82f6;
+        }
+        
+        .tab-active {
+            border-bottom: 3px solid #1e40af;
+            color: #1e40af;
+            font-weight: 600;
         }
         
         .tab {
-            flex: 1;
-            padding: 15px 20px;
-            text-align: center;
-            border-radius: 10px;
             cursor: pointer;
-            font-weight: 600;
+            padding: 10px 20px;
             transition: all 0.3s ease;
-            color: #718096;
         }
         
-        .tab.active {
-            background: #667eea;
-            color: white;
+        .tab:hover:not(.tab-active) {
+            background-color: #f1f5f9;
+            color: #1e40af;
         }
         
-        .tab-content {
+        .content-section {
             display: none;
         }
         
-        .tab-content.active {
+        .content-section.active {
             display: block;
         }
         
-        @media (max-width: 768px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-present {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-overtime {
+            background-color: #ffedd5;
+            color: #9a3412;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
             }
-            
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
+            to {
+                transform: translateX(0);
+                opacity: 1;
             }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.5s forwards;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <div class="header">
-            <h1>Construction Operations Dashboard</h1>
-            <p>Real-time monitoring of DPR, Manpower & Productivity</p>
-            <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 20px;">
-                <button id="refreshBtn" onclick="loadAllData()" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                    🔄 Refresh Data
-                </button>
-                <div id="loadingIndicator" style="display: none; color: #667eea; font-weight: 600;">
-                    ⏳ Loading data...
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loader"></div>
+        <p class="mt-4 text-gray-700 font-medium">Loading data from Google Sheets...</p>
+    </div>
+
+    <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+        <!-- Header -->
+        <header class="bg-white shadow-md">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="bg-blue-700 text-white p-2 rounded-lg mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">CDH Data Dashboard</h1>
+                        <p class="text-sm text-gray-500">Site Manager: Gurwinder Singh</p>
+                    </div>
                 </div>
-                <div id="lastRefresh" style="color: #718096; font-size: 0.9rem;">
-                    Last updated: Never
-                </div>
-                <div id="autoRefreshStatus" style="color: #48bb78; font-size: 0.9rem; font-weight: 600;">
-                    🟢 Auto-refresh: ON (Every hour)
-                </div>
-            </div>
-        </div>
-        
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-value erection">153.25</div>
-                <div class="metric-label">Total Erection Volume</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value dismantling">293.7</div>
-                <div class="metric-label">Total Dismantling Volume</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value productivity">2.1</div>
-                <div class="metric-label">Productivity Rate</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value manpower">144</div>
-                <div class="metric-label">Total Manhours</div>
-            </div>
-        </div>
-        
-        <div class="tabs">
-            <div class="tab active" onclick="showTab('overview')">Overview</div>
-            <div class="tab" onclick="showTab('allover')">All Over</div>
-            <div class="tab" onclick="showTab('dpr')">DPR Details</div>
-            <div class="tab" onclick="showTab('manpower')">Manpower</div>
-            <div class="tab" onclick="showTab('productivity')">Productivity</div>
-        </div>
-        
-        <div id="overview" class="tab-content active">
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <div class="chart-title">Work Type Distribution</div>
-                    <canvas id="workTypeChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title">Daily Volume Trend</div>
-                    <canvas id="volumeTrendChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title">Supervisor Performance</div>
-                    <canvas id="supervisorChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title">Manhours Distribution</div>
-                    <canvas id="manhoursChart"></canvas>
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <p class="text-sm text-gray-500">Last Updated</p>
+                        <p class="text-md font-semibold text-gray-800" id="last-updated">Loading...</p>
+                    </div>
+                    <button id="refresh-btn" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Refresh Data
+                    </button>
                 </div>
             </div>
-        </div>
-        
-        <div id="allover" class="tab-content">
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <div class="chart-title">Target vs Achievement Trend</div>
-                    <canvas id="targetAchievementChart"></canvas>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="dashboard-card bg-white p-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Total Erection</p>
+                            <h3 class="text-2xl font-bold text-gray-800" id="total-erection">Loading...</h3>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-gray-500">Progress</span>
+                            <span class="text-xs font-medium text-blue-700" id="erection-progress">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-value" id="erection-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="chart-card">
-                    <div class="chart-title">Daily Performance Overview</div>
-                    <canvas id="dailyPerformanceChart"></canvas>
+
+                <div class="dashboard-card bg-white p-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Total Dismantling</p>
+                            <h3 class="text-2xl font-bold text-gray-800" id="total-dismantling">Loading...</h3>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-gray-500">Progress</span>
+                            <span class="text-xs font-medium text-green-700" id="dismantling-progress">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-value bg-green-500" id="dismantling-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card bg-white p-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Total Manhours</p>
+                            <h3 class="text-2xl font-bold text-gray-800" id="total-manhours">Loading...</h3>
+                        </div>
+                        <div class="bg-purple-100 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-gray-500">Utilization</span>
+                            <span class="text-xs font-medium text-purple-700" id="manhours-utilization">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-value bg-purple-500" id="manhours-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card bg-white p-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Productivity</p>
+                            <h3 class="text-2xl font-bold text-gray-800" id="productivity-value">Loading...</h3>
+                        </div>
+                        <div class="bg-amber-100 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-gray-500">Target</span>
+                            <span class="text-xs font-medium text-amber-700" id="productivity-target">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-value bg-amber-500" id="productivity-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="data-table">
-                <div class="table-header">All Over Performance Data</div>
-                <div class="table-content">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Erection</th>
-                                <th>Dismantling</th>
-                                <th>Total Manhours</th>
-                                <th>Target</th>
-                                <th>Achieved</th>
-                                <th>Achievement %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="alloverTableBody">
-                        </tbody>
-                    </table>
+
+            <!-- Tabs Navigation -->
+            <div class="mb-6 border-b border-gray-200">
+                <div class="flex overflow-x-auto">
+                    <div class="tab tab-active" data-tab="overview">Overview</div>
+                    <div class="tab" data-tab="dpr">Daily Progress Report</div>
+                    <div class="tab" data-tab="manpower">Manpower</div>
+                    <div class="tab" data-tab="productivity">Productivity</div>
                 </div>
             </div>
-        </div>
-        
-        <div id="dpr" class="tab-content">
-            <div class="data-table">
-                <div class="table-header">Daily Progress Report (DPR)</div>
-                <div class="table-content">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Supervisor</th>
-                                <th>Work Type</th>
-                                <th>Dimensions (L×W×H)</th>
-                                <th>Qty</th>
-                                <th>Volume</th>
-                                <th>Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dprTableBody">
-                        </tbody>
-                    </table>
+
+            <!-- Tab Content -->
+            <div class="content-section active" id="overview-content">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Performance Chart -->
+                    <div class="dashboard-card bg-white p-6 lg:col-span-2">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Daily Performance</h3>
+                        <div class="h-80">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Supervisor Performance -->
+                    <div class="dashboard-card bg-white p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Supervisor Performance</h3>
+                        <div class="space-y-4" id="supervisor-performance">
+                            <!-- Will be populated by JavaScript -->
+                            <div class="flex justify-center items-center h-40">
+                                <div class="loader"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Progress -->
+                    <div class="dashboard-card bg-white p-6 lg:col-span-3">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Monthly Progress</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm font-medium month-filter" data-month="7">July</button>
+                                <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm font-medium month-filter" data-month="8">August</button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Date</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Erection (m³)</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Dismantling (m³)</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Total Manhours</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Target (m³)</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Achieved (m³)</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Achievement %</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="monthly-progress-table">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div id="manpower" class="tab-content">
-            <div class="data-table">
-                <div class="table-header">Manpower Allocation</div>
-                <div class="table-content">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Supervisor</th>
-                                <th>Employee Name</th>
-                                <th>OT Hours</th>
-                                <th>Total Manhours</th>
-                            </tr>
-                        </thead>
-                        <tbody id="manpowerTableBody">
-                        </tbody>
-                    </table>
+
+            <div class="content-section" id="dpr-content">
+                <div class="dashboard-card bg-white p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Daily Progress Report</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <div class="relative">
+                                <input type="date" id="dpr-date-filter" class="border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            </div>
+                            <select id="dpr-supervisor-filter" class="border border-gray-300 rounded-md px-3 py-2 text-sm">
+                                <option value="all">All Supervisors</option>
+                                <!-- Will be populated by JavaScript -->
+                            </select>
+                            <select id="dpr-worktype-filter" class="border border-gray-300 rounded-md px-3 py-2 text-sm">
+                                <option value="all">All Work Types</option>
+                                <option value="ERECTION">ERECTION</option>
+                                <option value="DISMANTLING">DISMANTLING</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Date</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Supervisor Name</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Work Type</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Length (m)</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Width (m)</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Height (m)</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Qty</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Volume (m³)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dpr-table">
+                                <!-- Will be populated by JavaScript -->
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="loader mx-auto"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div id="productivity" class="tab-content">
-            <div class="data-table">
-                <div class="table-header">Productivity Analysis</div>
-                <div class="table-content">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Supervisor Name</th>
-                                <th>Erection</th>
-                                <th>Dismantling</th>
-                                <th>Equivalent</th>
-                                <th>Total Manhours</th>
-                                <th>Productivity</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productivityTableBody">
-                        </tbody>
-                    </table>
+
+            <div class="content-section" id="manpower-content">
+                <div class="dashboard-card bg-white p-6 mb-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Manpower Attendance</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <div class="relative">
+                                <input type="date" id="manpower-date-filter" class="border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            </div>
+                            <select id="manpower-supervisor-filter" class="border border-gray-300 rounded-md px-3 py-2 text-sm">
+                                <option value="all">All Supervisors</option>
+                                <!-- Will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <div class="attendance-slider flex space-x-4 pb-4" id="attendance-slider">
+                            <!-- Will be populated by JavaScript -->
+                            <div class="flex justify-center items-center w-full h-40">
+                                <div class="loader"></div>
+                            </div>
+                        </div>
+                        <button id="prev-btn" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md z-10 hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <button id="next-btn" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md z-10 hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dashboard-card bg-white p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800">Manpower Details</h3>
+                    </div>
+                    <div class="table-container">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Date</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Supervisor Name</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Employee Name</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">OT Hours</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Total Manhours</th>
+                                    <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="manpower-table">
+                                <!-- Will be populated by JavaScript -->
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="loader mx-auto"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div class="content-section" id="productivity-content">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="dashboard-card bg-white p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Supervisor Productivity</h3>
+                        <div class="table-container">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Supervisor Name</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Erection (m³)</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Dismantling (m³)</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Equivalent (m³)</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Total Manhours</th>
+                                        <th class="bg-blue-700 text-white px-4 py-3 text-left text-sm font-medium">Productivity</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productivity-table">
+                                    <!-- Will be populated by JavaScript -->
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="loader mx-auto"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card bg-white p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Productivity Comparison</h3>
+                        <div class="h-80">
+                            <canvas id="productivityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card bg-white p-6 lg:col-span-2">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Weekly Productivity Trend</h3>
+                        <div class="h-80">
+                            <canvas id="weeklyProductivityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-6">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <h3 class="text-xl font-bold">CDH Data Dashboard</h3>
+                        <p class="text-gray-400">© 2025 All Rights Reserved</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">Site Manager: Gurwinder Singh</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script>
-        // Configuration - Replace with your Google Sheets URLs
-        const GOOGLE_SHEETS_CONFIG = {
-            DPR_SHEET_URL: 'YOUR_DPR_SHEET_URL_HERE',
-            MANPOWER_SHEET_URL: 'YOUR_MANPOWER_SHEET_URL_HERE', 
-            PRODUCTIVITY_SHEET_URL: 'YOUR_PRODUCTIVITY_SHEET_URL_HERE',
-            ALLOVER_SHEET_URL: 'YOUR_ALLOVER_SHEET_URL_HERE'
-        };
+        // CSV URLs
+        const DPR_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR770AQ-HHixlcLynNRlnX01iKGuoWbQjYKL4HuVkL6dkiQlneLSmavh0ol0qfNln4UTN20ZXIQ8yuY/pub?gid=0&single=true&output=csv';
+        const MANPOWER_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR770AQ-HHixlcLynNRlnX01iKGuoWbQjYKL4HuVkL6dkiQlneLSmavh0ol0qfNln4UTN20ZXIQ8yuY/pub?gid=1128347685&single=true&output=csv';
+        const PRODUCTIVITY_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR770AQ-HHixlcLynNRlnX01iKGuoWbQjYKL4HuVkL6dkiQlneLSmavh0ol0qfNln4UTN20ZXIQ8yuY/pub?gid=67021281&single=true&output=csv';
+        const ALL_OVER_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR770AQ-HHixlcLynNRlnX01iKGuoWbQjYKL4HuVkL6dkiQlneLSmavh0ol0qfNln4UTN20ZXIQ8yuY/pub?gid=834519060&single=true&output=csv';
 
-        // Data storage
+        // Global data storage
         let dprData = [];
         let manpowerData = [];
         let productivityData = [];
-        let allOverData = [];
-        let charts = {};
+        let overallData = [];
+        
+        // Charts
+        let performanceChart;
+        let productivityChart;
+        let weeklyProductivityChart;
 
-        // Sample fallback data (will be replaced by Google Sheets data)
-        const sampleDprData = [
-            {date: '2025-07-28', supervisor: 'MAHENDRA KUMAR', workType: 'DISMANTLING', length: 4.5, width: 2.8, height: 2, qty: 1, volume: 25.2, remarks: 'DISMANTLING: 25.2'},
-            {date: '2025-07-28', supervisor: 'MAHENDRA KUMAR', workType: 'ERECTION', length: 6, width: 2, height: 5, qty: 1, volume: 60, remarks: 'ERECTION: 60'}
-        ];
-
-        const sampleManpowerData = [
-            {date: '2025-07-28', supervisor: 'MAHENDRA KUMAR', empName: 'Deepak Das', otHours: 0, totalManhours: 8},
-            {date: '2025-07-28', supervisor: 'MAHENDRA KUMAR', empName: 'Niraj', otHours: 0, totalManhours: 8}
-        ];
-
-        const sampleProductivityData = [
-            {supName: 'MAHENDRA KUMAR', erection: 153.25, dismantling: 293.7, equivalent: 300.1, totalManhours: 144.0, productivity: 2.1}
-        ];
-
-        const sampleAllOverData = [
-            {date: '28-07-2025', erection: 153.25, dismantling: 293.7, totalManhours: 88, target: 281.6, achieved: 446.95},
-            {date: '29-07-2025', erection: 0, dismantling: 0, totalManhours: 64, target: 204.8, achieved: 0}
-        ];
-
-        // Google Sheets data fetching functions
-        async function fetchGoogleSheetData(url) {
+        // Function to fetch CSV data
+        async function fetchCSV(url) {
             try {
                 const response = await fetch(url);
-                const text = await response.text();
-                return parseCSVData(text);
-            } catch (error) {
-                console.error('Error fetching Google Sheets data:', error);
-                return null;
-            }
-        }
-
-        function parseCSVData(csvText) {
-            const lines = csvText.split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
-            const data = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                if (lines[i].trim()) {
-                    const values = lines[i].split(',').map(v => v.trim());
-                    const row = {};
-                    headers.forEach((header, index) => {
-                        row[header] = values[index] || '';
+                const csvText = await response.text();
+                
+                return new Promise((resolve) => {
+                    Papa.parse(csvText, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            resolve(results.data);
+                        }
                     });
-                    data.push(row);
-                }
+                });
+            } catch (error) {
+                console.error('Error fetching CSV:', error);
+                return [];
             }
-            return data;
         }
 
-        async function loadAllData() {
-            showLoadingIndicator();
+        // Function to format date strings
+        function formatDate(dateString) {
+            if (!dateString) return '';
             
+            // Check if the date is in DD-MM-YYYY format
+            if (dateString.includes('-') && dateString.split('-')[0].length === 2) {
+                const [day, month, year] = dateString.split('-');
+                return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            }
+            
+            // If already in YYYY-MM-DD format
+            return dateString;
+        }
+
+        // Function to parse numeric values safely
+        function parseNumeric(value) {
+            if (value === null || value === undefined || value === '') return 0;
+            if (typeof value === 'number') return value;
+            if (typeof value === 'string') {
+                // Remove any non-numeric characters except decimal point
+                const cleaned = value.replace(/[^\d.-]/g, '');
+                return parseFloat(cleaned) || 0;
+            }
+            return 0;
+        }
+
+        // Function to load all data
+        async function loadAllData() {
             try {
-                // Fetch data from Google Sheets
-                const [dprResult, manpowerResult, productivityResult, allOverResult] = await Promise.all([
-                    fetchGoogleSheetData(https://docs.google.com/spreadsheets/d/e/2PACX-1vR770AQ-HHixlcLynNRlnX01iKGuoWbQjYKL4HuVkL6dkiQlneLSmavh0ol0qfNln4UTN20ZXIQ8yuY/pub?gid=0&single=true&output=csv),
-                    fetchGoogleSheetData(https://docs.google.com/spreadsheets/d/e/2PACX-1vR770AQ-HHixlcLynNRlnX01iKGuoWbQjYKL4HuVkL6dkiQlneLSmavh0ol0qfNln4UTN20ZXIQ8yuY/pub?gid=1128347685&single=true&output=csv),
-                    fetchGoogleSheetData(https://docs.google.com/spreadsheets/d/e/2PACX-1vR770AQ-HHixlcLynNRlnX01iKGuoWbQjYKL4HuVkL6dkiQlneLSmavh0ol0qfNln4UTN20ZXIQ8yuY/pub?gid=67021281&single=true&output=csv),
-                    fetchGoogleSheetData(https://docs.google.com/spreadsheets/d/e/2PACX-1vR770AQ-HHixlcLynNRlnX01iKGuoWbQjYKL4HuVkL6dkiQlneLSmavh0ol0qfNln4UTN20ZXIQ8yuY/pub?gid=834519060&single=true&output=csv)
+                // Show loading overlay
+                document.getElementById('loading-overlay').style.display = 'flex';
+                
+                // Fetch all data in parallel
+                const [dprResult, manpowerResult, productivityResult, overallResult] = await Promise.all([
+                    fetchCSV(DPR_URL),
+                    fetchCSV(MANPOWER_URL),
+                    fetchCSV(PRODUCTIVITY_URL),
+                    fetchCSV(ALL_OVER_URL)
                 ]);
-
-                // Use fetched data or fallback to sample data
-                dprData = dprResult || sampleDprData;
-                manpowerData = manpowerResult || sampleManpowerData;
-                productivityData = productivityResult || sampleProductivityData;
-                allOverData = allOverResult || sampleAllOverData;
-
-                // Update dashboard
-                updateMetrics();
-                populateAllTables();
-                updateAllCharts();
                 
-                updateLastRefreshTime();
-                hideLoadingIndicator();
+                // Process DPR data
+                dprData = dprResult.map(item => ({
+                    date: formatDate(item.DATE),
+                    supervisor: item['SUPERVISOR NAME'],
+                    workType: item['WORK TYPE'],
+                    length: parseNumeric(item.LENGTH),
+                    width: parseNumeric(item.WIDTH),
+                    height: parseNumeric(item.HEIGHT),
+                    qty: parseNumeric(item.QTY),
+                    volume: parseNumeric(item.VOLUME)
+                }));
                 
+                // Process Manpower data
+                manpowerData = manpowerResult.map(item => ({
+                    date: formatDate(item.DATE),
+                    supervisor: item['SUPERVISOR NAME'],
+                    empName: item['EMP NAME'],
+                    otHours: parseNumeric(item['OT HOURS']),
+                    totalManhours: parseNumeric(item['TOTAL MANHOURS'])
+                }));
+                
+                // Process Productivity data
+                productivityData = productivityResult.map(item => ({
+                    supervisor: item['SUP NAME'],
+                    erection: parseNumeric(item.ERECTION),
+                    dismantling: parseNumeric(item.DISMANTLING),
+                    equivalent: parseNumeric(item.EQUILVENT),
+                    totalManhours: parseNumeric(item['TOTAL MANHOURS']),
+                    productivity: item.PRODUCTIVITY === '#DIV/0!' ? 0 : parseNumeric(item.PRODUCTIVITY)
+                }));
+                
+                // Process Overall data
+                overallData = overallResult.map(item => ({
+                    date: formatDate(item.DATE),
+                    erection: parseNumeric(item.ERECTION),
+                    dismantling: parseNumeric(item.DISMANTLING),
+                    totalManhours: parseNumeric(item['TOTAL MANHOURS']),
+                    target: parseNumeric(item.TARGET),
+                    achieved: parseNumeric(item.ACHEIVED)
+                }));
+                
+                // Update the UI with the loaded data
+                updateUI();
+                
+                // Hide loading overlay
+                document.getElementById('loading-overlay').style.display = 'none';
+                
+                // Update last updated time
+                document.getElementById('last-updated').textContent = new Date().toLocaleString();
             } catch (error) {
                 console.error('Error loading data:', error);
-                // Use sample data as fallback
-                dprData = sampleDprData;
-                manpowerData = sampleManpowerData;
-                productivityData = sampleProductivityData;
-                allOverData = sampleAllOverData;
+                document.getElementById('loading-overlay').style.display = 'none';
+                alert('Error loading data. Please try refreshing the page.');
+            }
+        }
+
+        // Function to update the UI with loaded data
+        function updateUI() {
+            // Update summary cards
+            updateSummaryCards();
+            
+            // Update DPR table
+            updateDPRTable();
+            
+            // Update Manpower table and attendance cards
+            updateManpowerTable();
+            
+            // Update Productivity table
+            updateProductivityTable();
+            
+            // Update Monthly Progress table
+            updateMonthlyProgressTable();
+            
+            // Update Supervisor Performance
+            updateSupervisorPerformance();
+            
+            // Update charts
+            updateCharts();
+            
+            // Set up filters
+            setupFilters();
+        }
+
+        // Function to update summary cards
+        function updateSummaryCards() {
+            // Calculate total erection
+            const totalErection = overallData.reduce((sum, item) => sum + parseNumeric(item.erection), 0);
+            document.getElementById('total-erection').textContent = totalErection.toFixed(2) + ' m³';
+            
+            // Calculate total dismantling
+            const totalDismantling = overallData.reduce((sum, item) => sum + parseNumeric(item.dismantling), 0);
+            document.getElementById('total-dismantling').textContent = totalDismantling.toFixed(2) + ' m³';
+            
+            // Calculate total manhours
+            const totalManhours = overallData.reduce((sum, item) => sum + parseNumeric(item.totalManhours), 0);
+            document.getElementById('total-manhours').textContent = totalManhours.toFixed(0) + ' hrs';
+            
+            // Calculate average productivity
+            const validProductivity = productivityData.filter(item => item.productivity > 0);
+            const avgProductivity = validProductivity.length > 0 ? 
+                validProductivity.reduce((sum, item) => sum + item.productivity, 0) / validProductivity.length : 0;
+            document.getElementById('productivity-value').textContent = avgProductivity.toFixed(2) + ' m³/hr';
+            
+            // Update progress bars
+            const targetTotal = overallData.reduce((sum, item) => sum + parseNumeric(item.target), 0);
+            const erectionProgress = targetTotal > 0 ? (totalErection / targetTotal) * 100 : 0;
+            document.getElementById('erection-progress').textContent = Math.min(100, erectionProgress.toFixed(0)) + '%';
+            document.getElementById('erection-progress-bar').style.width = Math.min(100, erectionProgress) + '%';
+            
+            const dismantlingProgress = targetTotal > 0 ? (totalDismantling / targetTotal) * 100 : 0;
+            document.getElementById('dismantling-progress').textContent = Math.min(100, dismantlingProgress.toFixed(0)) + '%';
+            document.getElementById('dismantling-progress-bar').style.width = Math.min(100, dismantlingProgress) + '%';
+            
+            // Assuming 8 hours per person is standard
+            const manhoursUtilization = manpowerData.length > 0 ? (totalManhours / (manpowerData.length * 8)) * 100 : 0;
+            document.getElementById('manhours-utilization').textContent = Math.min(100, manhoursUtilization.toFixed(0)) + '%';
+            document.getElementById('manhours-progress-bar').style.width = Math.min(100, manhoursUtilization) + '%';
+            
+            // Assuming target productivity is 2.0 m³/hr
+            const targetProductivity = 2.0;
+            const productivityProgress = (avgProductivity / targetProductivity) * 100;
+            document.getElementById('productivity-target').textContent = Math.min(100, productivityProgress.toFixed(0)) + '%';
+            document.getElementById('productivity-progress-bar').style.width = Math.min(100, productivityProgress) + '%';
+        }
+
+        // Function to update DPR table
+        function updateDPRTable() {
+            const dprTable = document.getElementById('dpr-table');
+            dprTable.innerHTML = '';
+            
+            if (dprData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="8" class="text-center py-4">No data available</td>`;
+                dprTable.appendChild(row);
+                return;
+            }
+            
+            dprData.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm">${item.date || ''}</td>
+                    <td class="px-4 py-3 text-sm">${item.supervisor || ''}</td>
+                    <td class="px-4 py-3 text-sm">${item.workType || ''}</td>
+                    <td class="px-4 py-3 text-sm">${item.length?.toFixed(2) || '0.00'}</td>
+                    <td class="px-4 py-3 text-sm">${item.width?.toFixed(2) || '0.00'}</td>
+                    <td class="px-4 py-3 text-sm">${item.height?.toFixed(2) || '0.00'}</td>
+                    <td class="px-4 py-3 text-sm">${item.qty || '0'}</td>
+                    <td class="px-4 py-3 text-sm font-medium">${item.volume?.toFixed(2) || '0.00'}</td>
+                `;
+                dprTable.appendChild(row);
+            });
+            
+            // Populate supervisor filter
+            const supervisorFilter = document.getElementById('dpr-supervisor-filter');
+            supervisorFilter.innerHTML = '<option value="all">All Supervisors</option>';
+            
+            const supervisors = [...new Set(dprData.map(item => item.supervisor).filter(Boolean))];
+            supervisors.forEach(supervisor => {
+                const option = document.createElement('option');
+                option.value = supervisor;
+                option.textContent = supervisor;
+                supervisorFilter.appendChild(option);
+            });
+            
+            // Set default date to most recent date in data
+            const dates = dprData.map(item => item.date).filter(Boolean);
+            if (dates.length > 0) {
+                const latestDate = new Date(Math.max(...dates.map(date => new Date(date))));
+                document.getElementById('dpr-date-filter').value = latestDate.toISOString().split('T')[0];
+            }
+        }
+
+        // Function to update Manpower table and attendance cards
+        function updateManpowerTable() {
+            const manpowerTable = document.getElementById('manpower-table');
+            manpowerTable.innerHTML = '';
+            
+            if (manpowerData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" class="text-center py-4">No data available</td>`;
+                manpowerTable.appendChild(row);
+                return;
+            }
+            
+            manpowerData.forEach(item => {
+                const row = document.createElement('tr');
+                const status = parseNumeric(item.totalManhours) > 8 ? 
+                    `<span class="status-badge status-overtime">Present + OT</span>` : 
+                    `<span class="status-badge status-present">Present</span>`;
                 
-                populateAllTables();
-                updateAllCharts();
-                hideLoadingIndicator();
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm">${item.date || ''}</td>
+                    <td class="px-4 py-3 text-sm">${item.supervisor || ''}</td>
+                    <td class="px-4 py-3 text-sm font-medium">${item.empName || ''}</td>
+                    <td class="px-4 py-3 text-sm">${item.otHours || '0'}</td>
+                    <td class="px-4 py-3 text-sm">${item.totalManhours || '0'}</td>
+                    <td class="px-4 py-3 text-sm">${status}</td>
+                `;
+                manpowerTable.appendChild(row);
+            });
+            
+            // Update attendance cards
+            updateAttendanceCards();
+            
+            // Populate supervisor filter
+            const supervisorFilter = document.getElementById('manpower-supervisor-filter');
+            supervisorFilter.innerHTML = '<option value="all">All Supervisors</option>';
+            
+            const supervisors = [...new Set(manpowerData.map(item => item.supervisor).filter(Boolean))];
+            supervisors.forEach(supervisor => {
+                const option = document.createElement('option');
+                option.value = supervisor;
+                option.textContent = supervisor;
+                supervisorFilter.appendChild(option);
+            });
+            
+            // Set default date to most recent date in data
+            const dates = manpowerData.map(item => item.date).filter(Boolean);
+            if (dates.length > 0) {
+                const latestDate = new Date(Math.max(...dates.map(date => new Date(date))));
+                document.getElementById('manpower-date-filter').value = latestDate.toISOString().split('T')[0];
             }
         }
 
-        function showLoadingIndicator() {
-            const indicator = document.getElementById('loadingIndicator');
-            if (indicator) indicator.style.display = 'block';
-        }
-
-        function hideLoadingIndicator() {
-            const indicator = document.getElementById('loadingIndicator');
-            if (indicator) indicator.style.display = 'none';
-        }
-
-        function updateLastRefreshTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString();
-            const refreshElement = document.getElementById('lastRefresh');
-            if (refreshElement) {
-                refreshElement.textContent = `Last updated: ${timeString}`;
+        // Function to update attendance cards
+        function updateAttendanceCards() {
+            const attendanceSlider = document.getElementById('attendance-slider');
+            attendanceSlider.innerHTML = '';
+            
+            if (manpowerData.length === 0) {
+                attendanceSlider.innerHTML = '<div class="flex justify-center items-center w-full h-40"><p>No attendance data available</p></div>';
+                return;
             }
-        }
-
-        // Tab functionality
-        function showTab(tabName) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
             
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected tab content
-            document.getElementById(tabName).classList.add('active');
-            
-            // Add active class to clicked tab
-            event.target.classList.add('active');
-        }
-
-        // Update metrics
-        function updateMetrics() {
-            const erectionTotal = dprData.filter(d => d.workType === 'ERECTION').reduce((sum, d) => sum + parseFloat(d.volume || 0), 0);
-            const dismantlingTotal = dprData.filter(d => d.workType === 'DISMANTLING').reduce((sum, d) => sum + parseFloat(d.volume || 0), 0);
-            const totalManhours = manpowerData.reduce((sum, d) => sum + parseFloat(d.totalManhours || 0), 0);
-            const avgProductivity = productivityData.filter(p => p.productivity !== 'N/A' && p.productivity > 0)
-                .reduce((sum, p, _, arr) => sum + parseFloat(p.productivity || 0) / arr.length, 0);
-
-            document.querySelector('.erection .metric-value').textContent = erectionTotal.toFixed(2);
-            document.querySelector('.dismantling .metric-value').textContent = dismantlingTotal.toFixed(2);
-            document.querySelector('.productivity .metric-value').textContent = avgProductivity.toFixed(1);
-            document.querySelector('.manpower .metric-value').textContent = totalManhours;
-        }
-
-        // Populate tables
-        function populateDPRTable() {
-            const tbody = document.getElementById('dprTableBody');
-            tbody.innerHTML = '';
-            
-            dprData.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.date || ''}</td>
-                    <td>${row.supervisor || ''}</td>
-                    <td><span class="status-badge ${(row.workType || '').toLowerCase()}-badge">${row.workType || ''}</span></td>
-                    <td>${row.length || ''}×${row.width || ''}×${row.height || ''}</td>
-                    <td>${row.qty || ''}</td>
-                    <td>${row.volume || ''}</td>
-                    <td>${row.remarks || ''}</td>
+            manpowerData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'attendance-card bg-white rounded-lg shadow-md p-4 flex flex-col';
+                
+                const status = parseNumeric(item.totalManhours) > 8 ? 
+                    `<span class="status-badge status-overtime">Present + OT</span>` : 
+                    `<span class="status-badge status-present">Present</span>`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-semibold text-gray-800">${item.empName || 'Unknown'}</h4>
+                            <p class="text-xs text-gray-500">${item.supervisor || ''}</p>
+                        </div>
+                        ${status}
+                    </div>
+                    <div class="mt-auto">
+                        <div class="flex justify-between text-xs text-gray-600 mb-1">
+                            <span>Hours</span>
+                            <span>${item.totalManhours || '0'} hrs</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-value ${parseNumeric(item.totalManhours) > 8 ? 'bg-amber-500' : 'bg-green-500'}" 
+                                style="width: ${(parseNumeric(item.totalManhours) / 12) * 100}%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Date: ${item.date || ''}</p>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                attendanceSlider.appendChild(card);
             });
         }
 
-        function populateManpowerTable() {
-            const tbody = document.getElementById('manpowerTableBody');
-            tbody.innerHTML = '';
+        // Function to update Productivity table
+        function updateProductivityTable() {
+            const productivityTable = document.getElementById('productivity-table');
+            productivityTable.innerHTML = '';
             
-            manpowerData.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.date || ''}</td>
-                    <td>${row.supervisor || ''}</td>
-                    <td>${row.empName || ''}</td>
-                    <td>${row.otHours || ''}</td>
-                    <td>${row.totalManhours || ''}</td>
+            if (productivityData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" class="text-center py-4">No data available</td>`;
+                productivityTable.appendChild(row);
+                return;
+            }
+            
+            productivityData.forEach(item => {
+                const row = document.createElement('tr');
+                const productivityValue = isNaN(item.productivity) || item.productivity === null ? 
+                    'N/A' : item.productivity.toFixed(2);
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm font-medium">${item.supervisor || ''}</td>
+                    <td class="px-4 py-3 text-sm">${item.erection?.toFixed(2) || '0.00'}</td>
+                    <td class="px-4 py-3 text-sm">${item.dismantling?.toFixed(2) || '0.00'}</td>
+                    <td class="px-4 py-3 text-sm">${item.equivalent?.toFixed(2) || '0.00'}</td>
+                    <td class="px-4 py-3 text-sm">${item.totalManhours?.toFixed(1) || '0.0'}</td>
+                    <td class="px-4 py-3 text-sm font-medium ${parseNumeric(item.productivity) > 0 ? 'text-green-600' : 'text-gray-500'}">${productivityValue}</td>
                 `;
-                tbody.appendChild(tr);
+                productivityTable.appendChild(row);
             });
         }
 
-        function populateProductivityTable() {
-            const tbody = document.getElementById('productivityTableBody');
-            tbody.innerHTML = '';
+        // Function to update Monthly Progress table
+        function updateMonthlyProgressTable(month = null) {
+            const monthlyProgressTable = document.getElementById('monthly-progress-table');
+            monthlyProgressTable.innerHTML = '';
             
-            productivityData.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.supName || ''}</td>
-                    <td>${row.erection || ''}</td>
-                    <td>${row.dismantling || ''}</td>
-                    <td>${row.equivalent || ''}</td>
-                    <td>${row.totalManhours || ''}</td>
-                    <td>${row.productivity || ''}</td>
+            let filteredData = [...overallData];
+            
+            // Filter by month if specified
+            if (month !== null) {
+                filteredData = filteredData.filter(item => {
+                    if (!item.date) return false;
+                    const date = new Date(item.date);
+                    return date.getMonth() + 1 === month;
+                });
+            }
+            
+            if (filteredData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="7" class="text-center py-4">No data available for the selected month</td>`;
+                monthlyProgressTable.appendChild(row);
+                return;
+            }
+            
+            filteredData.forEach(item => {
+                const row = document.createElement('tr');
+                const achievementPercent = parseNumeric(item.target) > 0 ? 
+                    ((parseNumeric(item.achieved) / parseNumeric(item.target)) * 100).toFixed(1) : 'N/A';
+                
+                const achievementClass = achievementPercent >= 100 ? 'text-green-600' : 
+                                        (achievementPercent >= 80 ? 'text-amber-600' : 'text-red-600');
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm">${item.date || ''}</td>
+                    <td class="px-4 py-3 text-sm">${item.erection?.toFixed(2) || '0.00'}</td>
+                    <td class="px-4 py-3 text-sm">${item.dismantling?.toFixed(2) || '0.00'}</td>
+                    <td class="px-4 py-3 text-sm">${item.totalManhours || '0'}</td>
+                    <td class="px-4 py-3 text-sm">${item.target?.toFixed(2) || '0.00'}</td>
+                    <td class="px-4 py-3 text-sm">${item.achieved?.toFixed(2) || '0.00'}</td>
+                    <td class="px-4 py-3 text-sm font-medium ${achievementClass}">${achievementPercent !== 'N/A' ? achievementPercent + '%' : achievementPercent}</td>
                 `;
-                tbody.appendChild(tr);
+                monthlyProgressTable.appendChild(row);
             });
         }
 
-        function populateAllOverTable() {
-            const tbody = document.getElementById('alloverTableBody');
-            tbody.innerHTML = '';
+        // Function to update Supervisor Performance
+        function updateSupervisorPerformance() {
+            const supervisorPerformance = document.getElementById('supervisor-performance');
+            supervisorPerformance.innerHTML = '';
             
-            allOverData.forEach(row => {
-                const target = parseFloat(row.target || 0);
-                const achieved = parseFloat(row.achieved || 0);
-                const achievementPercent = target > 0 ? ((achieved / target) * 100).toFixed(1) : '0.0';
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.date || ''}</td>
-                    <td>${row.erection || ''}</td>
-                    <td>${row.dismantling || ''}</td>
-                    <td>${row.totalManhours || ''}</td>
-                    <td>${row.target || ''}</td>
-                    <td>${row.achieved || ''}</td>
-                    <td>${achievementPercent}%</td>
+            if (productivityData.length === 0) {
+                supervisorPerformance.innerHTML = '<div class="flex justify-center items-center h-40"><p>No productivity data available</p></div>';
+                return;
+            }
+            
+            // Sort by productivity (highest first)
+            const sortedData = [...productivityData]
+                .filter(item => item.productivity > 0)
+                .sort((a, b) => b.productivity - a.productivity);
+            
+            // If no valid productivity data
+            if (sortedData.length === 0) {
+                supervisorPerformance.innerHTML = '<div class="flex justify-center items-center h-40"><p>No valid productivity data available</p></div>';
+                return;
+            }
+            
+            // Get the highest productivity for scaling
+            const maxProductivity = Math.max(...sortedData.map(item => item.productivity));
+            
+            sortedData.forEach(item => {
+                const percentage = (item.productivity / maxProductivity) * 100;
+                
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-700">${item.supervisor}</span>
+                        <span class="text-sm font-medium text-blue-700">${item.productivity.toFixed(2)}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-value bg-blue-500" style="width: ${percentage}%"></div>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                supervisorPerformance.appendChild(div);
             });
         }
 
-        function populateAllTables() {
-            populateDPRTable();
-            populateManpowerTable();
-            populateProductivityTable();
-            populateAllOverTable();
+        // Function to update charts
+        function updateCharts() {
+            // Performance Chart
+            updatePerformanceChart();
+            
+            // Productivity Comparison Chart
+            updateProductivityComparisonChart();
+            
+            // Weekly Productivity Chart
+            updateWeeklyProductivityChart();
         }
 
-        // Create and update charts
-        function createCharts() {
-            createWorkTypeChart();
-            createVolumeTrendChart();
-            createSupervisorChart();
-            createManhoursChart();
-            createTargetAchievementChart();
-            createDailyPerformanceChart();
-        }
-
-        function createWorkTypeChart() {
-            const ctx = document.getElementById('workTypeChart').getContext('2d');
-            const erectionTotal = dprData.filter(d => d.workType === 'ERECTION').reduce((sum, d) => sum + parseFloat(d.volume || 0), 0);
-            const dismantlingTotal = dprData.filter(d => d.workType === 'DISMANTLING').reduce((sum, d) => sum + parseFloat(d.volume || 0), 0);
+        // Function to update Performance Chart
+        function updatePerformanceChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
             
-            if (charts.workType) charts.workType.destroy();
-            charts.workType = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Erection', 'Dismantling'],
-                    datasets: [{
-                        data: [erectionTotal, dismantlingTotal],
-                        backgroundColor: ['#48bb78', '#ed8936'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
-
-        function createVolumeTrendChart() {
-            const ctx = document.getElementById('volumeTrendChart').getContext('2d');
-            const dateGroups = {};
+            // Sort data by date
+            const sortedData = [...overallData]
+                .filter(item => item.date)
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
             
-            dprData.forEach(d => {
-                if (!dateGroups[d.date]) {
-                    dateGroups[d.date] = { erection: 0, dismantling: 0 };
-                }
-                if (d.workType === 'ERECTION') {
-                    dateGroups[d.date].erection += parseFloat(d.volume || 0);
-                } else if (d.workType === 'DISMANTLING') {
-                    dateGroups[d.date].dismantling += parseFloat(d.volume || 0);
-                }
-            });
-
-            const dates = Object.keys(dateGroups).sort();
+            // Take only the last 7 days with data
+            const chartData = sortedData.slice(-7);
             
-            if (charts.volumeTrend) charts.volumeTrend.destroy();
-            charts.volumeTrend = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: 'Erection',
-                        data: dates.map(d => dateGroups[d].erection),
-                        borderColor: '#48bb78',
-                        backgroundColor: 'rgba(72, 187, 120, 0.1)',
-                        tension: 0.4
-                    }, {
-                        label: 'Dismantling',
-                        data: dates.map(d => dateGroups[d].dismantling),
-                        borderColor: '#ed8936',
-                        backgroundColor: 'rgba(237, 137, 54, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        function createSupervisorChart() {
-            const ctx = document.getElementById('supervisorChart').getContext('2d');
-            const activeSupervisors = productivityData.filter(p => p.productivity !== 'N/A' && parseFloat(p.productivity || 0) > 0);
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
             
-            if (charts.supervisor) charts.supervisor.destroy();
-            charts.supervisor = new Chart(ctx, {
+            performanceChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: activeSupervisors.map(p => (p.supName || '').split(' ')[0]),
-                    datasets: [{
-                        label: 'Productivity',
-                        data: activeSupervisors.map(p => parseFloat(p.productivity || 0)),
-                        backgroundColor: '#667eea',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        function createManhoursChart() {
-            const ctx = document.getElementById('manhoursChart').getContext('2d');
-            const dateGroups = {};
-            manpowerData.forEach(m => {
-                if (!dateGroups[m.date]) dateGroups[m.date] = 0;
-                dateGroups[m.date] += parseFloat(m.totalManhours || 0);
-            });
-            
-            if (charts.manhours) charts.manhours.destroy();
-            charts.manhours = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(dateGroups),
-                    datasets: [{
-                        label: 'Total Manhours',
-                        data: Object.values(dateGroups),
-                        backgroundColor: '#9f7aea',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        function createTargetAchievementChart() {
-            const ctx = document.getElementById('targetAchievementChart').getContext('2d');
-            const activeData = allOverData.filter(d => parseFloat(d.target || 0) > 0 || parseFloat(d.achieved || 0) > 0);
-            
-            if (charts.targetAchievement) charts.targetAchievement.destroy();
-            charts.targetAchievement = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: activeData.map(d => (d.date || '').substring(0, 5)),
-                    datasets: [{
-                        label: 'Target',
-                        data: activeData.map(d => parseFloat(d.target || 0)),
-                        borderColor: '#f56565',
-                        backgroundColor: 'rgba(245, 101, 101, 0.1)',
-                        tension: 0.4
-                    }, {
-                        label: 'Achieved',
-                        data: activeData.map(d => parseFloat(d.achieved || 0)),
-                        borderColor: '#48bb78',
-                        backgroundColor: 'rgba(72, 187, 120, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        function createDailyPerformanceChart() {
-            const ctx = document.getElementById('dailyPerformanceChart').getContext('2d');
-            const activeData = allOverData.filter(d => parseFloat(d.target || 0) > 0 || parseFloat(d.achieved || 0) > 0);
-            
-            if (charts.dailyPerformance) charts.dailyPerformance.destroy();
-            charts.dailyPerformance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: activeData.map(d => (d.date || '').substring(0, 5)),
-                    datasets: [{
-                        label: 'Erection',
-                        data: activeData.map(d => parseFloat(d.erection || 0)),
-                        backgroundColor: '#48bb78',
-                        borderRadius: 4
-                    }, {
-                        label: 'Dismantling',
-                        data: activeData.map(d => parseFloat(d.dismantling || 0)),
-                        backgroundColor: '#ed8936',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    },
-                    scales: {
-                        x: {
-                            stacked: true
+                    labels: chartData.map(item => item.date),
+                    datasets: [
+                        {
+                            label: 'Erection',
+                            data: chartData.map(item => item.erection),
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
                         },
+                        {
+                            label: 'Dismantling',
+                            data: chartData.map(item => item.dismantling),
+                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Target',
+                            data: chartData.map(item => item.target),
+                            type: 'line',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(245, 158, 11, 1)',
+                            fill: false,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
                         y: {
-                            stacked: true,
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Volume (m³)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: false,
+                            text: 'Daily Performance'
                         }
                     }
                 }
             });
         }
 
-        function updateAllCharts() {
-            createCharts();
+        // Function to update Productivity Comparison Chart
+        function updateProductivityComparisonChart() {
+            const ctx = document.getElementById('productivityChart').getContext('2d');
+            
+            // Filter and sort data
+            const chartData = [...productivityData]
+                .filter(item => item.productivity > 0)
+                .sort((a, b) => b.productivity - a.productivity);
+            
+            if (productivityChart) {
+                productivityChart.destroy();
+            }
+            
+            productivityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.map(item => item.supervisor),
+                    datasets: [
+                        {
+                            label: 'Productivity (m³/hr)',
+                            data: chartData.map(item => item.productivity),
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(16, 185, 129, 0.7)',
+                                'rgba(245, 158, 11, 0.7)',
+                                'rgba(239, 68, 68, 0.7)',
+                                'rgba(139, 92, 246, 0.7)',
+                                'rgba(236, 72, 153, 0.7)',
+                                'rgba(75, 85, 99, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(16, 185, 129, 1)',
+                                'rgba(245, 158, 11, 1)',
+                                'rgba(239, 68, 68, 1)',
+                                'rgba(139, 92, 246, 1)',
+                                'rgba(236, 72, 153, 1)',
+                                'rgba(75, 85, 99, 1)'
+                            ],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Productivity (m³/hr)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
         }
 
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load initial data
-            loadAllData();
+        // Function to update Weekly Productivity Chart
+        function updateWeeklyProductivityChart() {
+            const ctx = document.getElementById('weeklyProductivityChart').getContext('2d');
             
-            // Set up auto-refresh every hour (3600000 milliseconds)
-            setInterval(loadAllData, 3600000);
+            // Group data by week
+            const weeklyData = groupDataByWeek(overallData);
             
-            // Also refresh every 5 minutes for testing (remove this in production)
-            // setInterval(loadAllData, 300000);
+            if (weeklyProductivityChart) {
+                weeklyProductivityChart.destroy();
+            }
+            
+            weeklyProductivityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: weeklyData.map(item => `Week ${item.week}`),
+                    datasets: [
+                        {
+                            label: 'Actual Productivity',
+                            data: weeklyData.map(item => item.productivity),
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Target Productivity',
+                            data: weeklyData.map(() => 2.0), // Assuming target is 2.0
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Productivity (m³/hr)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to group data by week
+        function groupDataByWeek(data) {
+            const weeklyData = [];
+            
+            // Group data by week
+            const weekMap = new Map();
+            
+            data.forEach(item => {
+                if (!item.date) return;
+                
+                const date = new Date(item.date);
+                const year = date.getFullYear();
+                const weekNumber = getWeekNumber(date);
+                const weekKey = `${year}-${weekNumber}`;
+                
+                if (!weekMap.has(weekKey)) {
+                    weekMap.set(weekKey, {
+                        week: weekNumber,
+                        year: year,
+                        totalVolume: 0,
+                        totalManhours: 0,
+                        dates: []
+                    });
+                }
+                
+                const weekData = weekMap.get(weekKey);
+                weekData.totalVolume += parseNumeric(item.erection) + parseNumeric(item.dismantling);
+                weekData.totalManhours += parseNumeric(item.totalManhours);
+                weekData.dates.push(item.date);
+            });
+            
+            // Calculate productivity for each week
+            weekMap.forEach((value, key) => {
+                const productivity = value.totalManhours > 0 ? value.totalVolume / value.totalManhours : 0;
+                weeklyData.push({
+                    week: value.week,
+                    year: value.year,
+                    productivity: productivity
+                });
+            });
+            
+            // Sort by year and week
+            return weeklyData.sort((a, b) => {
+                if (a.year !== b.year) return a.year - b.year;
+                return a.week - b.week;
+            });
+        }
+
+        // Function to get week number
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // Function to set up filters
+        function setupFilters() {
+            // DPR filters
+            const dprDateFilter = document.getElementById('dpr-date-filter');
+            const dprSupervisorFilter = document.getElementById('dpr-supervisor-filter');
+            const dprWorkTypeFilter = document.getElementById('dpr-worktype-filter');
+            
+            function filterDPRData() {
+                const dateValue = dprDateFilter.value;
+                const supervisorValue = dprSupervisorFilter.value;
+                const workTypeValue = dprWorkTypeFilter.value;
+                
+                let filteredData = [...dprData];
+                
+                if (dateValue) {
+                    filteredData = filteredData.filter(item => item.date === dateValue);
+                }
+                
+                if (supervisorValue !== 'all') {
+                    filteredData = filteredData.filter(item => item.supervisor === supervisorValue);
+                }
+                
+                if (workTypeValue !== 'all') {
+                    filteredData = filteredData.filter(item => item.workType === workTypeValue);
+                }
+                
+                const dprTable = document.getElementById('dpr-table');
+                dprTable.innerHTML = '';
+                
+                if (filteredData.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="8" class="text-center py-4">No data matches the selected filters</td>`;
+                    dprTable.appendChild(row);
+                    return;
+                }
+                
+                filteredData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-4 py-3 text-sm">${item.date || ''}</td>
+                        <td class="px-4 py-3 text-sm">${item.supervisor || ''}</td>
+                        <td class="px-4 py-3 text-sm">${item.workType || ''}</td>
+                        <td class="px-4 py-3 text-sm">${item.length?.toFixed(2) || '0.00'}</td>
+                        <td class="px-4 py-3 text-sm">${item.width?.toFixed(2) || '0.00'}</td>
+                        <td class="px-4 py-3 text-sm">${item.height?.toFixed(2) || '0.00'}</td>
+                        <td class="px-4 py-3 text-sm">${item.qty || '0'}</td>
+                        <td class="px-4 py-3 text-sm font-medium">${item.volume?.toFixed(2) || '0.00'}</td>
+                    `;
+                    dprTable.appendChild(row);
+                });
+            }
+            
+            dprDateFilter.addEventListener('change', filterDPRData);
+            dprSupervisorFilter.addEventListener('change', filterDPRData);
+            dprWorkTypeFilter.addEventListener('change', filterDPRData);
+            
+            // Manpower filters
+            const manpowerDateFilter = document.getElementById('manpower-date-filter');
+            const manpowerSupervisorFilter = document.getElementById('manpower-supervisor-filter');
+            
+            function filterManpowerData() {
+                const dateValue = manpowerDateFilter.value;
+                const supervisorValue = manpowerSupervisorFilter.value;
+                
+                let filteredData = [...manpowerData];
+                
+                if (dateValue) {
+                    filteredData = filteredData.filter(item => item.date === dateValue);
+                }
+                
+                if (supervisorValue !== 'all') {
+                    filteredData = filteredData.filter(item => item.supervisor === supervisorValue);
+                }
+                
+                const manpowerTable = document.getElementById('manpower-table');
+                manpowerTable.innerHTML = '';
+                
+                if (filteredData.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="6" class="text-center py-4">No data matches the selected filters</td>`;
+                    manpowerTable.appendChild(row);
+                    
+                    // Clear attendance cards
+                    const attendanceSlider = document.getElementById('attendance-slider');
+                    attendanceSlider.innerHTML = '<div class="flex justify-center items-center w-full h-40"><p>No attendance data matches the selected filters</p></div>';
+                    return;
+                }
+                
+                filteredData.forEach(item => {
+                    const row = document.createElement('tr');
+                    const status = parseNumeric(item.totalManhours) > 8 ? 
+                        `<span class="status-badge status-overtime">Present + OT</span>` : 
+                        `<span class="status-badge status-present">Present</span>`;
+                    
+                    row.innerHTML = `
+                        <td class="px-4 py-3 text-sm">${item.date || ''}</td>
+                        <td class="px-4 py-3 text-sm">${item.supervisor || ''}</td>
+                        <td class="px-4 py-3 text-sm font-medium">${item.empName || ''}</td>
+                        <td class="px-4 py-3 text-sm">${item.otHours || '0'}</td>
+                        <td class="px-4 py-3 text-sm">${item.totalManhours || '0'}</td>
+                        <td class="px-4 py-3 text-sm">${status}</td>
+                    `;
+                    manpowerTable.appendChild(row);
+                });
+                
+                // Update attendance cards with filtered data
+                const attendanceSlider = document.getElementById('attendance-slider');
+                attendanceSlider.innerHTML = '';
+                
+                filteredData.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'attendance-card bg-white rounded-lg shadow-md p-4 flex flex-col';
+                    
+                    const status = parseNumeric(item.totalManhours) > 8 ? 
+                        `<span class="status-badge status-overtime">Present + OT</span>` : 
+                        `<span class="status-badge status-present">Present</span>`;
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-semibold text-gray-800">${item.empName || 'Unknown'}</h4>
+                                <p class="text-xs text-gray-500">${item.supervisor || ''}</p>
+                            </div>
+                            ${status}
+                        </div>
+                        <div class="mt-auto">
+                            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                <span>Hours</span>
+                                <span>${item.totalManhours || '0'} hrs</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-value ${parseNumeric(item.totalManhours) > 8 ? 'bg-amber-500' : 'bg-green-500'}" 
+                                    style="width: ${(parseNumeric(item.totalManhours) / 12) * 100}%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Date: ${item.date || ''}</p>
+                        </div>
+                    `;
+                    attendanceSlider.appendChild(card);
+                });
+            }
+            
+            manpowerDateFilter.addEventListener('change', filterManpowerData);
+            manpowerSupervisorFilter.addEventListener('change', filterManpowerData);
+            
+            // Month filter for Monthly Progress
+            const monthFilters = document.querySelectorAll('.month-filter');
+            monthFilters.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    monthFilters.forEach(btn => {
+                        btn.classList.remove('bg-blue-100', 'text-blue-700');
+                        btn.classList.add('bg-gray-100', 'text-gray-700');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.remove('bg-gray-100', 'text-gray-700');
+                    this.classList.add('bg-blue-100', 'text-blue-700');
+                    
+                    // Update table with selected month
+                    const month = parseInt(this.getAttribute('data-month'));
+                    updateMonthlyProgressTable(month);
+                });
+            });
+        }
+
+        // Attendance slider navigation
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slider = document.getElementById('attendance-slider');
+        
+        nextBtn.addEventListener('click', () => {
+            slider.scrollBy({ left: 500, behavior: 'smooth' });
         });
+        
+        prevBtn.addEventListener('click', () => {
+            slider.scrollBy({ left: -500, behavior: 'smooth' });
+        });
+
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and content sections
+                tabs.forEach(t => t.classList.remove('tab-active'));
+                contentSections.forEach(section => section.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content section
+                tab.classList.add('tab-active');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+            });
+        });
+
+        // Refresh button functionality
+        document.getElementById('refresh-btn').addEventListener('click', () => {
+            loadAllData();
+        });
+
+        // Auto-refresh data every 5 minutes
+        function setupAutoRefresh() {
+            setInterval(() => {
+                loadAllData();
+            }, 5 * 60 * 1000); // 5 minutes
+        }
+
+        // Initialize the dashboard
+        function init() {
+            loadAllData();
+            setupAutoRefresh();
+        }
+
+        // Start the dashboard
+        init();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9669f342c3d085c9',t:'MTc1Mzc2NDE1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
