@@ -3,512 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Construction Safety - MANPOWER Upload</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Construction Safety - TBT Image Upload</title>
     <style>
-        .upload-area {
-            border: 3px dashed #f59e0b;
-            transition: all 0.3s ease;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .upload-area.dragover {
-            border-color: #dc2626;
-            background-color: #fef2f2;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .safety-icon {
+            font-size: 4em;
+            color: #ff6b35;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px 20px;
+            background: linear-gradient(45deg, #f8f9ff 0%, #fff 100%);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone:hover {
+            border-color: #5a67d8;
+            background: linear-gradient(45deg, #f0f2ff 0%, #fff 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .upload-zone.dragover {
+            border-color: #4c51bf;
+            background: linear-gradient(45deg, #e6f3ff 0%, #fff 100%);
             transform: scale(1.02);
         }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #4a5568;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .upload-subtext {
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        .preview-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+            color: #4a5568;
+            font-size: 0.9em;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .upload-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #e53e3e;
+        }
+
+        .status.uploading {
+            background: #bee3f8;
+            color: #2c5282;
+            border: 2px solid #3182ce;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #bee3f8;
+            border-radius: 50%;
+            border-top-color: #3182ce;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
             transition: width 0.3s ease;
+            border-radius: 3px;
         }
-        
-        /* Construction Safety Animations */
-        @keyframes hardhatBounce {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-10px) rotate(-2deg); }
-            75% { transform: translateY(-5px) rotate(2deg); }
-        }
-        
-        @keyframes safetyBlink {
-            0%, 50% { opacity: 1; }
-            25%, 75% { opacity: 0.3; }
-        }
-        
-        @keyframes constructionPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        @keyframes warningFlash {
-            0%, 100% { background-color: #fbbf24; }
-            50% { background-color: #dc2626; }
-        }
-        
-        @keyframes workerWalk {
-            0% { transform: translateX(-20px); }
-            50% { transform: translateX(10px) scaleX(-1); }
-            100% { transform: translateX(-20px) scaleX(1); }
-        }
-        
-        @keyframes craneSwing {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(5deg); }
-        }
-        
-        .hardhat-bounce { animation: hardhatBounce 2s ease-in-out infinite; }
-        .safety-blink { animation: safetyBlink 1.5s ease-in-out infinite; }
-        .construction-pulse { animation: constructionPulse 2s ease-in-out infinite; }
-        .warning-flash { animation: warningFlash 1s ease-in-out infinite; }
-        .worker-walk { animation: workerWalk 4s ease-in-out infinite; }
-        .crane-swing { animation: craneSwing 3s ease-in-out infinite; }
-        
-        /* Mobile optimizations */
-        @media (max-width: 640px) {
-            .container { padding: 1rem; }
-            .safety-icons { flex-wrap: wrap; gap: 0.5rem; }
-        }
-        
-        /* Construction theme colors */
-        .construction-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .construction-red { background: linear-gradient(135deg, #dc2626, #b91c1c); }
-        .construction-yellow { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
     </style>
 </head>
-<body class="bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 min-h-screen">
-    <!-- Animated Construction Background -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none opacity-10">
-        <div class="absolute top-10 left-10 crane-swing">
-            <svg class="w-16 h-16 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M3 21h18v-2H3v2zM5 19h14v-2H5v2zM7 17h10v-2H7v2zM9 15h6v-2H9v2zM11 13h2v-2h-2v2z"/>
-            </svg>
-        </div>
-        <div class="absolute top-20 right-10 worker-walk">
-            <svg class="w-12 h-12 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 5.5V6.5L12.5 7.5C12.1 7.7 11.6 7.6 11.3 7.3L9.5 5.5C9.1 5.1 8.5 5.1 8.1 5.5S7.6 6.4 8 6.8L10 8.8V22H12V16H14V22H16V10.8L21 9Z"/>
-            </svg>
-        </div>
-    </div>
-
-    <div class="container mx-auto px-4 py-6 max-w-lg relative z-10">
-        <!-- Header with Safety Theme -->
-        <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-t-3xl p-6 text-white relative overflow-hidden">
-            <div class="absolute top-2 right-2 hardhat-bounce">
-                <svg class="w-8 h-8 text-yellow-300" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM12 7C13.1 7 14 7.9 14 9S13.1 11 12 11 10 10.1 10 9 10.9 7 12 7ZM18 15H6V13.5C6 11.6 8.7 10.5 12 10.5S18 11.6 18 13.5V15Z"/>
-                </svg>
-            </div>
-            <h1 class="text-2xl sm:text-3xl font-bold mb-2">🏗️ CONSTRUCTION SAFETY</h1>
-            <p class="text-orange-100 text-sm sm:text-base">MANPOWER Upload Portal</p>
-            
-            <!-- Safety Warning Banner -->
-            <div class="mt-4 bg-yellow-400 text-black px-3 py-2 rounded-lg warning-flash">
-                <div class="flex items-center text-xs sm:text-sm font-bold">
-                    <span class="mr-2">⚠️</span>
-                    <span>SAFETY FIRST - UPLOAD REQUIRED</span>
-                </div>
-            </div>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="safety-icon">⚠️</div>
+            <h1>Construction Safety TBT</h1>
+            <p>Upload safety images and toolbox talk topics</p>
         </div>
 
-        <!-- Main Upload Form -->
-        <div class="bg-white rounded-b-3xl shadow-2xl p-6 sm:p-8">
-            <!-- Safety Icons Row -->
-            <div class="flex justify-center items-center space-x-4 mb-6 safety-icons">
-                <div class="construction-pulse">
-                    <div class="w-12 h-12 construction-orange rounded-full flex items-center justify-center">
-                        <span class="text-white text-xl">⛑️</span>
-                    </div>
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="tbtTopic">Toolbox Talk Topic:</label>
+                <input type="text" id="tbtTopic" name="tbtTopic" placeholder="Enter the TBT topic..." required>
+            </div>
+
+            <div class="form-group">
+                <label>Safety Image Upload:</label>
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">Click to upload or drag and drop</div>
+                    <div class="upload-subtext">All image formats supported • Max 10MB</div>
+                    <input type="file" id="imageInput" accept="image/*" required>
                 </div>
-                <div class="safety-blink">
-                    <div class="w-12 h-12 construction-red rounded-full flex items-center justify-center">
-                        <span class="text-white text-xl">🦺</span>
-                    </div>
-                </div>
-                <div class="construction-pulse">
-                    <div class="w-12 h-12 construction-yellow rounded-full flex items-center justify-center">
-                        <span class="text-white text-xl">👷</span>
-                    </div>
+                
+                <div class="preview-container" id="previewContainer" style="display: none;">
+                    <img id="previewImage" class="preview-image" alt="Preview">
+                    <div class="file-info" id="fileInfo"></div>
                 </div>
             </div>
 
-            <form id="uploadForm" class="space-y-6">
-                <!-- Text Input with Construction Theme -->
-                <div>
-                    <label for="topicText" class="block text-sm font-bold text-gray-800 mb-2 flex items-center">
-                        <span class="mr-2">📋</span>
-                        SAFETY TOPIC / MANPOWER DETAILS
-                    </label>
-                    <input 
-                        type="text" 
-                        id="topicText" 
-                        name="topicText"
-                        placeholder="Enter safety topic or manpower details..."
-                        class="w-full px-4 py-3 border-2 border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 text-sm sm:text-base"
-                        required
-                    >
-                </div>
+            <button type="submit" class="upload-btn" id="uploadBtn">
+                Upload to Safety Sheet
+            </button>
 
-                <!-- File Upload Area with Safety Theme -->
-                <div>
-                    <label class="block text-sm font-bold text-gray-800 mb-2 flex items-center">
-                        <span class="mr-2">📸</span>
-                        SAFETY IMAGE UPLOAD (Max 10MB)
-                    </label>
-                    <div 
-                        id="uploadArea" 
-                        class="upload-area rounded-xl p-6 sm:p-8 text-center cursor-pointer bg-gradient-to-br from-orange-50 to-yellow-50"
-                    >
-                        <input 
-                            type="file" 
-                            id="imageFile" 
-                            name="imageFile"
-                            accept="image/*"
-                            class="hidden"
-                            required
-                        >
-                        <div id="uploadContent">
-                            <!-- Animated Construction Worker -->
-                            <div class="mb-4">
-                                <div class="inline-block hardhat-bounce">
-                                    <svg class="mx-auto h-16 w-16 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 5.5V6.5L12.5 7.5C12.1 7.7 11.6 7.6 11.3 7.3L9.5 5.5C9.1 5.1 8.5 5.1 8.1 5.5S7.6 6.4 8 6.8L10 8.8V22H12V16H14V22H16V10.8L21 9Z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <p class="text-lg font-bold text-orange-700 mb-2">🏗️ DROP SAFETY IMAGE HERE</p>
-                            <p class="text-sm text-orange-600 mb-4">or tap to browse files</p>
-                            <div class="flex justify-center space-x-2 text-xs text-gray-500">
-                                <span>📱 Mobile Friendly</span>
-                                <span>•</span>
-                                <span>🖼️ All Formats</span>
-                                <span>•</span>
-                                <span>⚡ Fast Upload</span>
-                            </div>
-                        </div>
-                        <div id="previewContent" class="hidden">
-                            <img id="previewImage" class="mx-auto max-h-32 rounded-lg mb-4 border-2 border-orange-300" alt="Preview">
-                            <p id="fileName" class="text-sm font-bold text-orange-700"></p>
-                            <p id="fileSize" class="text-xs text-orange-500"></p>
-                            <div class="mt-2 text-green-600 font-bold text-sm">✅ READY FOR UPLOAD</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Progress Bar with Construction Theme -->
-                <div id="progressContainer" class="hidden">
-                    <div class="bg-gray-200 rounded-full h-3 overflow-hidden">
-                        <div id="progressBar" class="progress-bar construction-orange h-3 rounded-full relative">
-                            <div class="absolute inset-0 bg-white opacity-30 animate-pulse"></div>
-                        </div>
-                    </div>
-                    <p id="progressText" class="text-sm text-orange-600 mt-2 text-center font-bold">🚧 UPLOADING TO SAFETY DATABASE...</p>
-                </div>
-
-                <!-- Submit Button with Safety Theme -->
-                <button 
-                    type="submit" 
-                    id="submitBtn"
-                    class="w-full construction-orange hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-orange-300 text-sm sm:text-base shadow-lg"
-                >
-                    <span class="flex items-center justify-center">
-                        <span class="mr-2">🚀</span>
-                        UPLOAD TO MANPOWER SHEET
-                        <span class="ml-2">⛑️</span>
-                    </span>
-                </button>
-            </form>
-
-            <!-- Animated Safety Mascot -->
-            <div class="mt-6 text-center">
-                <div class="inline-block construction-pulse">
-                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-full p-4 shadow-lg">
-                        <span class="text-2xl">👷‍♂️</span>
-                    </div>
-                </div>
-                <p class="text-xs text-gray-600 mt-2 font-medium">Safety Sam says: "Always upload your safety documentation!"</p>
+            <div class="progress-bar" id="progressBar" style="display: none;">
+                <div class="progress-fill" id="progressFill"></div>
             </div>
+        </form>
 
-            <!-- Status Messages with Construction Theme -->
-            <div id="statusMessage" class="mt-6 hidden">
-                <div id="successMessage" class="bg-green-50 border-2 border-green-300 text-green-800 px-4 py-3 rounded-xl hidden">
-                    <div class="flex items-center text-sm sm:text-base">
-                        <span class="text-2xl mr-3">✅</span>
-                        <div>
-                            <div class="font-bold">UPLOAD SUCCESSFUL!</div>
-                            <div class="text-xs">Data safely stored in MANPOWER sheet</div>
-                        </div>
-                    </div>
-                </div>
-                <div id="errorMessage" class="bg-red-50 border-2 border-red-300 text-red-800 px-4 py-3 rounded-xl hidden">
-                    <div class="flex items-center text-sm sm:text-base">
-                        <span class="text-2xl mr-3 safety-blink">⚠️</span>
-                        <div>
-                            <div class="font-bold">UPLOAD FAILED!</div>
-                            <div id="errorText" class="text-xs">Please check connection and try again</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Connection Status -->
-            <div class="mt-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 border border-green-200">
-                <div class="text-center">
-                    <div class="text-sm font-bold text-green-700 mb-2">✅ CONNECTED TO GOOGLE SHEET</div>
-                    <div class="text-xs text-green-600 font-medium">
-                        Ready to upload images and text to MANPOWER sheet
-                    </div>
-                </div>
-            </div>
-
-            <!-- Safety Tips Footer -->
-            <div class="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
-                <div class="text-center">
-                    <div class="text-lg mb-2">🛡️ SAFETY REMINDER</div>
-                    <div class="text-xs text-blue-700 font-medium">
-                        Always wear proper PPE • Follow safety protocols • Report hazards immediately
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Floating Safety Elements -->
-    <div class="fixed bottom-4 right-4 pointer-events-none">
-        <div class="construction-pulse">
-            <div class="w-12 h-12 construction-red rounded-full flex items-center justify-center shadow-lg">
-                <span class="text-white text-xl">🚨</span>
-            </div>
-        </div>
+        <div id="status"></div>
     </div>
 
     <script>
-        // Replace this with your actual Google Apps Script web app URL
+        // Replace with your actual Google Apps Script Web App URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTfrAhvPgvzO5qcaCF2QFQxXkAa_s65KX3aiS-sc17TlXjGp0mKiX_EVDcF9oDNR90/exec';
         
-        // Alternative method for better compatibility
-        const USE_ALTERNATIVE_METHOD = true;
-        
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('imageFile');
-        const uploadContent = document.getElementById('uploadContent');
-        const previewContent = document.getElementById('previewContent');
+        const uploadZone = document.getElementById('uploadZone');
+        const imageInput = document.getElementById('imageInput');
+        const previewContainer = document.getElementById('previewContainer');
         const previewImage = document.getElementById('previewImage');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
+        const fileInfo = document.getElementById('fileInfo');
         const uploadForm = document.getElementById('uploadForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const progressContainer = document.getElementById('progressContainer');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const status = document.getElementById('status');
         const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
-        const statusMessage = document.getElementById('statusMessage');
-        const successMessage = document.getElementById('successMessage');
-        const errorMessage = document.getElementById('errorMessage');
-        const errorText = document.getElementById('errorText');
+        const progressFill = document.getElementById('progressFill');
+        const tbtTopic = document.getElementById('tbtTopic');
 
-        // File size limit (10MB)
-        const MAX_FILE_SIZE = 10 * 1024 * 1024;
+        // Click to upload
+        uploadZone.addEventListener('click', () => imageInput.click());
 
-        // Mobile-friendly touch events
-        let touchStartY = 0;
-        let touchEndY = 0;
-
-        // Enhanced drag and drop with mobile support
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', handleDragOver);
-        uploadArea.addEventListener('dragleave', handleDragLeave);
-        uploadArea.addEventListener('drop', handleDrop);
-        uploadArea.addEventListener('touchstart', handleTouchStart, { passive: true });
-        uploadArea.addEventListener('touchend', handleTouchEnd, { passive: true });
-        fileInput.addEventListener('change', handleFileSelect);
-
-        function handleTouchStart(e) {
-            touchStartY = e.touches[0].clientY;
-            uploadArea.style.transform = 'scale(0.98)';
-        }
-
-        function handleTouchEnd(e) {
-            touchEndY = e.changedTouches[0].clientY;
-            uploadArea.style.transform = 'scale(1)';
-            
-            // Simple tap detection
-            if (Math.abs(touchStartY - touchEndY) < 10) {
-                fileInput.click();
-            }
-        }
-
-        function handleDragOver(e) {
+        // Drag and drop functionality
+        uploadZone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            uploadArea.classList.add('dragover');
-        }
+            uploadZone.classList.add('dragover');
+        });
 
-        function handleDragLeave(e) {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-        }
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
 
-        function handleDrop(e) {
+        uploadZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadArea.classList.remove('dragover');
+            uploadZone.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                fileInput.files = files;
-                handleFileSelect();
+                handleFileSelect(files[0]);
             }
-        }
+        });
 
-        function handleFileSelect() {
-            const file = fileInput.files[0];
-            if (!file) return;
-
-            // Validate file size
-            if (file.size > MAX_FILE_SIZE) {
-                showError('⚠️ File too large! Maximum size is 10MB. Please compress your image.');
-                fileInput.value = '';
-                return;
+        // File input change
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
             }
+        });
 
-            // Validate file type
+        function handleFileSelect(file) {
+            // Validate file
             if (!file.type.startsWith('image/')) {
-                showError('⚠️ Invalid file type! Please select an image file.');
-                fileInput.value = '';
+                showStatus('Please select an image file.', 'error');
                 return;
             }
 
-            // Show preview with animation
+            if (file.size > 10 * 1024 * 1024) {
+                showStatus('File size must be less than 10MB.', 'error');
+                return;
+            }
+
+            // Show preview
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = (e) => {
                 previewImage.src = e.target.result;
-                fileName.textContent = `📁 ${file.name}`;
-                fileSize.textContent = `📊 ${formatFileSize(file.size)}`;
+                previewContainer.style.display = 'block';
                 
-                uploadContent.style.opacity = '0';
-                setTimeout(() => {
-                    uploadContent.classList.add('hidden');
-                    previewContent.classList.remove('hidden');
-                    previewContent.style.opacity = '0';
-                    setTimeout(() => {
-                        previewContent.style.opacity = '1';
-                    }, 100);
-                }, 200);
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                fileInfo.textContent = `${file.name} (${fileSize} MB)`;
             };
             reader.readAsDataURL(file);
+
+            // Store file for upload
+            imageInput.files = new DataTransfer().files;
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            imageInput.files = dt.files;
         }
 
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Enhanced form submission with better mobile feedback
-        uploadForm.addEventListener('submit', handleSubmit);
-
-        async function handleSubmit(e) {
+        // Form submission
+        uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const topicText = document.getElementById('topicText').value.trim();
-            const file = fileInput.files[0];
-
-            if (!topicText) {
-                showError('⚠️ Please enter safety topic or manpower details!');
-                document.getElementById('topicText').focus();
+            if (!imageInput.files[0]) {
+                showStatus('Please select an image file.', 'error');
                 return;
             }
 
-            if (!file) {
-                showError('⚠️ Please select a safety image to upload!');
+            if (!tbtTopic.value.trim()) {
+                showStatus('Please enter a TBT topic.', 'error');
                 return;
             }
 
-            // Enhanced mobile feedback
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `
-                <span class="flex items-center justify-center">
-                    <span class="mr-2 animate-spin">⚙️</span>
-                    UPLOADING...
-                    <span class="ml-2">🚧</span>
-                </span>
-            `;
+            await uploadToSheet();
+        });
+
+        async function uploadToSheet() {
+            const file = imageInput.files[0];
+            const topic = tbtTopic.value.trim();
             
-            progressContainer.classList.remove('hidden');
-            hideMessages();
-            simulateProgress();
-
-            // Add haptic feedback for mobile devices
-            if (navigator.vibrate) {
-                navigator.vibrate(100);
-            }
+            uploadBtn.disabled = true;
+            showStatus('Uploading to safety sheet...', 'uploading');
+            progressBar.style.display = 'block';
 
             try {
-                // Convert file to base64
+                // Convert image to base64
                 const base64 = await fileToBase64(file);
+                
+                // Simulate progress
+                updateProgress(30);
                 
                 // Prepare form data
                 const formData = new FormData();
-                formData.append('topicText', topicText);
-                formData.append('imageData', base64);
-                formData.append('fileName', file.name);
-                formData.append('fileType', file.type);
+                formData.append('image', base64);
+                formData.append('filename', file.name);
+                formData.append('mimeType', file.type);
+                formData.append('tbtTopic', topic);
+                
+                updateProgress(60);
 
-                // Upload to Google Apps Script with better error handling
-                let response, result;
+                // Upload to Google Apps Script
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                updateProgress(90);
+
+                const result = await response.json();
                 
-                if (USE_ALTERNATIVE_METHOD) {
-                    // Method 1: Using URLSearchParams for better compatibility
-                    const params = new URLSearchParams();
-                    params.append('topicText', topicText);
-                    params.append('imageData', base64);
-                    params.append('fileName', file.name);
-                    params.append('fileType', file.type);
-                    
-                    response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: params.toString(),
-                        mode: 'no-cors'
-                    });
-                    
-                    // For no-cors mode, we assume success if no error is thrown
-                    result = 'success: Upload completed';
+                updateProgress(100);
+
+                if (result.success) {
+                    showStatus('✅ Successfully uploaded to safety sheet!', 'success');
+                    uploadForm.reset();
+                    previewContainer.style.display = 'none';
+                    setTimeout(() => {
+                        progressBar.style.display = 'none';
+                        progressFill.style.width = '0%';
+                    }, 2000);
                 } else {
-                    // Method 2: Original FormData method
-                    response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    result = await response.text();
-                }
-                
-                if (USE_ALTERNATIVE_METHOD || (response.ok && result.includes('success'))) {
-                    showSuccess();
-                    resetForm();
-                    
-                    // Success haptic feedback
-                    if (navigator.vibrate) {
-                        navigator.vibrate([100, 50, 100]);
-                    }
-                } else {
-                    throw new Error(result || 'Upload failed - Please check your Google Apps Script URL');
+                    throw new Error(result.error || 'Upload failed');
                 }
 
             } catch (error) {
                 console.error('Upload error:', error);
-                showError('🚨 Upload failed: ' + error.message);
-                
-                // Error haptic feedback
-                if (navigator.vibrate) {
-                    navigator.vibrate([200, 100, 200]);
-                }
+                showStatus('❌ Upload failed. Please try again.', 'error');
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `
-                    <span class="flex items-center justify-center">
-                        <span class="mr-2">🚀</span>
-                        UPLOAD TO MANPOWER SHEET
-                        <span class="ml-2">⛑️</span>
-                    </span>
-                `;
-                progressContainer.classList.add('hidden');
+                uploadBtn.disabled = false;
             }
         }
 
@@ -521,97 +433,17 @@
             });
         }
 
-        function showSuccess() {
-            statusMessage.classList.remove('hidden');
-            successMessage.classList.remove('hidden');
-            errorMessage.classList.add('hidden');
-            
-            // Scroll to success message on mobile
-            setTimeout(() => {
-                successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+        function updateProgress(percent) {
+            progressFill.style.width = percent + '%';
         }
 
-        function showError(message) {
-            statusMessage.classList.remove('hidden');
-            errorMessage.classList.remove('hidden');
-            successMessage.classList.add('hidden');
-            errorText.textContent = message;
-            
-            // Scroll to error message on mobile
-            setTimeout(() => {
-                errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+        function showStatus(message, type) {
+            status.innerHTML = type === 'uploading' 
+                ? `<div class="loading-spinner"></div>${message}` 
+                : message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
         }
-
-        function hideMessages() {
-            statusMessage.classList.add('hidden');
-            successMessage.classList.add('hidden');
-            errorMessage.classList.add('hidden');
-        }
-
-        function resetForm() {
-            document.getElementById('topicText').value = '';
-            fileInput.value = '';
-            uploadContent.classList.remove('hidden');
-            previewContent.classList.add('hidden');
-            uploadContent.style.opacity = '1';
-        }
-
-        // Enhanced progress simulation with construction theme
-        function simulateProgress() {
-            let progress = 0;
-            const messages = [
-                '🚧 Initializing upload...',
-                '📤 Sending to safety database...',
-                '🔒 Securing data transmission...',
-                '📊 Processing safety information...',
-                '✅ Almost complete...'
-            ];
-            
-            const interval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress > 90) progress = 90;
-                progressBar.style.width = progress + '%';
-                
-                const messageIndex = Math.floor((progress / 100) * messages.length);
-                if (messages[messageIndex]) {
-                    progressText.textContent = messages[messageIndex];
-                }
-                
-                if (progress >= 90) {
-                    clearInterval(interval);
-                    progressText.textContent = '🎯 Finalizing upload...';
-                }
-            }, 300);
-        }
-
-        // Add some fun construction sounds (optional - commented out for accessibility)
-        // function playConstructionSound() {
-        //     const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
-        // }
-
-        // Responsive design adjustments
-        function adjustForMobile() {
-            if (window.innerWidth < 640) {
-                document.body.style.fontSize = '14px';
-            } else {
-                document.body.style.fontSize = '16px';
-            }
-        }
-
-        window.addEventListener('resize', adjustForMobile);
-        adjustForMobile();
-
-        // Prevent zoom on double tap for iOS
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96e63c39b1306edd',t:'MTc1NTA2NzM3NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
