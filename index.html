@@ -381,8 +381,8 @@
                 // Simulate progress
                 updateProgress(30);
                 
-                // Prepare form data
-                const formData = new FormData();
+                // Prepare data as URL-encoded form data (compatible with Google Apps Script)
+                const formData = new URLSearchParams();
                 formData.append('image', base64);
                 formData.append('filename', file.name);
                 formData.append('mimeType', file.type);
@@ -390,10 +390,13 @@
                 
                 updateProgress(60);
 
-                // Upload to Google Apps Script
+                // Upload to Google Apps Script with proper headers
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString()
                 });
 
                 updateProgress(90);
