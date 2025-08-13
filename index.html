@@ -371,35 +371,40 @@
             const topic = tbtTopic.value.trim();
             
             uploadBtn.disabled = true;
-            showStatus('Uploading to safety sheet...', 'uploading');
+            showStatus('Preparing upload...', 'uploading');
             progressBar.style.display = 'block';
 
             try {
-                // Convert image to base64
-                const base64 = await fileToBase64(file);
+                // Resize image before upload to reduce size
+                const resizedBase64 = await resizeImage(file, 800, 600); // Resize to max 800x600 before upload
                 
-                // Simulate progress
-                updateProgress(30);
+                updateProgress(20);
+                showStatus('Uploading to safety sheet...', 'uploading');
                 
-                // Prepare data as URL-encoded form data (compatible with Google Apps Script)
-                const formData = new URLSearchParams();
-                formData.append('image', base64);
-                formData.append('filename', file.name);
-                formData.append('mimeType', file.type);
-                formData.append('tbtTopic', topic);
+                // Prepare data as JSON (simpler for Google Apps Script)
+                const payload = {
+                    image: resizedBase64,
+                    filename: file.name,
+                    mimeType: file.type,
+                    tbtTopic: topic
+                };
                 
-                updateProgress(60);
+                updateProgress(40);
 
-                // Upload to Google Apps Script with proper headers
+                // Upload to Google Apps Script with JSON payload
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/json',
                     },
-                    body: formData.toString()
+                    body: JSON.stringify(payload)
                 });
 
-                updateProgress(90);
+                updateProgress(70);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
                 const result = await response.json();
                 
@@ -419,12 +424,46 @@
 
             } catch (error) {
                 console.error('Upload error:', error);
-                showStatus('❌ Upload failed. Please try again.', 'error');
+                showStatus(`❌ Upload failed: ${error.message}`, 'error');
                 progressBar.style.display = 'none';
                 progressFill.style.width = '0%';
             } finally {
                 uploadBtn.disabled = false;
             }
+        }
+
+        function resizeImage(file, maxWidth, maxHeight) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    // Calculate new dimensions
+                    let { width, height } = img;
+                    
+                    if (width > maxWidth) {
+                        height = (height * maxWidth) / width;
+                        width = maxWidth;
+                    }
+                    
+                    if (height > maxHeight) {
+                        width = (width * maxHeight) / height;
+                        height = maxHeight;
+                    }
+                    
+                    // Set canvas size
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Draw and compress
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+                    resolve(compressedBase64);
+                };
+                
+                img.src = URL.createObjectURL(file);
+            });
         }
 
         function fileToBase64(file) {
