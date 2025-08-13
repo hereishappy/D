@@ -376,28 +376,24 @@
 
             try {
                 // Resize image before upload to reduce size
-                const resizedBase64 = await resizeImage(file, 800, 600); // Resize to max 800x600 before upload
+                const resizedBase64 = await resizeImage(file, 800, 600);
                 
                 updateProgress(20);
                 showStatus('Uploading to safety sheet...', 'uploading');
                 
-                // Prepare data as JSON (simpler for Google Apps Script)
-                const payload = {
-                    image: resizedBase64,
-                    filename: file.name,
-                    mimeType: file.type,
-                    tbtTopic: topic
-                };
+                // Use FormData approach - more reliable with Google Apps Script
+                const formData = new FormData();
+                formData.append('image', resizedBase64);
+                formData.append('filename', file.name);
+                formData.append('mimeType', file.type);
+                formData.append('tbtTopic', topic);
                 
                 updateProgress(40);
 
-                // Upload to Google Apps Script with JSON payload
+                // Upload to Google Apps Script (no Content-Type header - let browser set it)
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
+                    body: formData
                 });
 
                 updateProgress(70);
@@ -406,7 +402,16 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const result = await response.json();
+                const responseText = await response.text();
+                let result;
+                
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('Response parsing error:', parseError);
+                    console.error('Raw response:', responseText);
+                    throw new Error('Invalid response from server');
+                }
                 
                 updateProgress(100);
 
