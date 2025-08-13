@@ -381,41 +381,31 @@
                 updateProgress(20);
                 showStatus('Uploading to safety sheet...', 'uploading');
                 
-                // Use FormData approach - more reliable with Google Apps Script
-                const formData = new FormData();
-                formData.append('image', resizedBase64);
-                formData.append('filename', file.name);
-                formData.append('mimeType', file.type);
-                formData.append('tbtTopic', topic);
+                // Try multiple upload methods
+                let result = null;
+                let lastError = null;
                 
-                updateProgress(40);
-
-                // Upload to Google Apps Script (no Content-Type header - let browser set it)
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                updateProgress(70);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const responseText = await response.text();
-                let result;
-                
+                // Method 1: FormData (most reliable for Google Apps Script)
                 try {
-                    result = JSON.parse(responseText);
-                } catch (parseError) {
-                    console.error('Response parsing error:', parseError);
-                    console.error('Raw response:', responseText);
-                    throw new Error('Invalid response from server');
+                    result = await uploadWithFormData(resizedBase64, file.name, file.type, topic);
+                } catch (error) {
+                    console.log('FormData method failed:', error);
+                    lastError = error;
+                }
+                
+                // Method 2: Fallback with form submission if fetch fails
+                if (!result) {
+                    try {
+                        result = await uploadWithFormSubmission(resizedBase64, file.name, file.type, topic);
+                    } catch (error) {
+                        console.log('Form submission method failed:', error);
+                        lastError = error;
+                    }
                 }
                 
                 updateProgress(100);
 
-                if (result.success) {
+                if (result && result.success) {
                     showStatus('✅ Successfully uploaded to safety sheet!', 'success');
                     uploadForm.reset();
                     previewContainer.style.display = 'none';
@@ -424,17 +414,117 @@
                         progressFill.style.width = '0%';
                     }, 2000);
                 } else {
-                    throw new Error(result.error || 'Upload failed');
+                    throw lastError || new Error(result?.error || 'Upload failed');
                 }
 
             } catch (error) {
                 console.error('Upload error:', error);
-                showStatus(`❌ Upload failed: ${error.message}`, 'error');
+                let errorMessage = error.message;
+                
+                if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+                    errorMessage = 'Network error. Please check your internet connection and try again.';
+                }
+                
+                showStatus(`❌ Upload failed: ${errorMessage}`, 'error');
                 progressBar.style.display = 'none';
                 progressFill.style.width = '0%';
             } finally {
                 uploadBtn.disabled = false;
             }
+        }
+
+        async function uploadWithFormData(base64, filename, mimeType, topic) {
+            updateProgress(40);
+            
+            const formData = new FormData();
+            formData.append('image', base64);
+            formData.append('filename', filename);
+            formData.append('mimeType', mimeType);
+            formData.append('tbtTopic', topic);
+
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: formData,
+                mode: 'cors'
+            });
+
+            updateProgress(70);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const responseText = await response.text();
+            
+            try {
+                return JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('Response parsing error:', parseError);
+                console.error('Raw response:', responseText);
+                throw new Error('Invalid response from server');
+            }
+        }
+
+        async function uploadWithFormSubmission(base64, filename, mimeType, topic) {
+            return new Promise((resolve, reject) => {
+                updateProgress(50);
+                
+                // Create a hidden form for submission
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = SCRIPT_URL;
+                form.target = 'upload-frame';
+                form.style.display = 'none';
+                
+                // Create hidden inputs
+                const inputs = [
+                    { name: 'image', value: base64 },
+                    { name: 'filename', value: filename },
+                    { name: 'mimeType', value: mimeType },
+                    { name: 'tbtTopic', value: topic }
+                ];
+                
+                inputs.forEach(input => {
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = input.name;
+                    hiddenInput.value = input.value;
+                    form.appendChild(hiddenInput);
+                });
+                
+                // Create hidden iframe
+                const iframe = document.createElement('iframe');
+                iframe.name = 'upload-frame';
+                iframe.style.display = 'none';
+                
+                // Handle iframe load
+                iframe.onload = function() {
+                    updateProgress(90);
+                    
+                    try {
+                        const response = iframe.contentDocument.body.textContent;
+                        const result = JSON.parse(response);
+                        
+                        // Clean up
+                        document.body.removeChild(form);
+                        document.body.removeChild(iframe);
+                        
+                        resolve(result);
+                    } catch (error) {
+                        console.error('Form submission response error:', error);
+                        reject(new Error('Failed to parse response from form submission'));
+                    }
+                };
+                
+                iframe.onerror = function() {
+                    reject(new Error('Form submission failed'));
+                };
+                
+                // Add to DOM and submit
+                document.body.appendChild(form);
+                document.body.appendChild(iframe);
+                form.submit();
+            });
         }
 
         function resizeImage(file, maxWidth, maxHeight) {
