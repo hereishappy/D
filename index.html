@@ -1,161 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Daily Reports Web App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Report Form</title>
   <style>
     body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #f8fafc;
-      color: #111;
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      display: flex; flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f7f7f7;
+      height: 100vh;
     }
     .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 16px;
-    }
-    h1 {
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-    }
-    .card {
       background: #fff;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.05);
-      margin-bottom: 1rem;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
     }
-    .field {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 12px;
-    }
-    label {
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-    }
-    input, textarea {
-      padding: 10px;
-      font-size: 1rem;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      width: 100%;
-    }
-    textarea {
-      min-height: 80px;
+    h2 { text-align: center; margin-bottom: 20px; }
+    input, textarea, button {
+      width: 100%; padding: 12px;
+      margin: 8px 0; border: 1px solid #ccc;
+      border-radius: 8px; font-size: 16px;
     }
     button {
-      background: #111827;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
+      background: #007bff; color: #fff;
+      border: none; cursor: pointer;
     }
-    button:disabled {
-      opacity: 0.6;
-    }
-    .status {
-      margin-top: 8px;
-      font-size: 0.9rem;
-    }
-    .ok { color: #065f46; }
-    .err { color: #b91c1c; }
+    button:hover { background: #0056b3; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Daily Reports</h1>
-    
-    <div class="card">
-      <div class="field">
-        <label>1) Absent Count (C13)</label>
-        <input type="number" id="absentCount" />
-      </div>
-      <div class="field">
-        <label>2) B Shift Count (C14)</label>
-        <input type="number" id="bShiftCount" />
-      </div>
-      <div class="field">
-        <label>3) Gate Pass Process Count (C15)</label>
-        <input type="number" id="gatePassCount" />
-      </div>
-      <div class="field">
-        <label>4) TBT Topic Text (C16)</label>
-        <textarea id="tbtText"></textarea>
-      </div>
-      <button onclick="saveCounts()">Save Counts</button>
-      <div id="saveStatus" class="status"></div>
-    </div>
-    
-    <div class="card">
-      <div class="field">
-        <label>5) Upload Photo (A18)</label>
-        <input type="file" id="photo" accept="image/*" />
-      </div>
-      <button onclick="uploadPhoto()">Upload Photo</button>
-      <div id="uploadStatus" class="status"></div>
-    </div>
+    <h2>Daily Report</h2>
+    <form id="reportForm">
+      <input type="number" id="absent" placeholder="Absent Count" required>
+      <input type="number" id="bShift" placeholder="B Shift Count" required>
+      <input type="number" id="gatePass" placeholder="Gate Pass Process Count" required>
+      <textarea id="tbtTopic" placeholder="TBT Topic" required></textarea>
+      <input type="file" id="photo" accept="image/*">
+      <button type="submit">Submit</button>
+    </form>
+    <p id="status"></p>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyayMJ1kNw3TFVfPfLebeMkrTOMPy5Uv-ZbVJi3EG6DG4fjgTISc2I2SwH1_SLMTbWA/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyDM_0iVZmlPq0ELKeKCCIfKdYY4qBfuG7o8qJTpm7Z_Xx5L39JfedZ4k7sLk-LdJWP/exec"; // <-- Replace with Apps Script Web App URL
 
-    async function saveCounts() {
-      const payload = {
-        absentCount: document.getElementById('absentCount').value,
-        bShiftCount: document.getElementById('bShiftCount').value,
-        gatePassCount: document.getElementById('gatePassCount').value,
-        tbtText: document.getElementById('tbtText').value
-      };
-      document.getElementById('saveStatus').textContent = "Saving...";
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "saveCounts", payload }),
-          headers: { "Content-Type": "application/json" }
-        });
-        const data = await res.json();
-        document.getElementById('saveStatus').innerHTML = data.ok ? 
-          "<span class='ok'>✅ Saved</span>" : "<span class='err'>❌ Error</span>";
-      } catch (err) {
-        document.getElementById('saveStatus').innerHTML = "<span class='err'>❌ "+err+"</span>";
-      }
-    }
+    document.getElementById("reportForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
 
-    async function uploadPhoto() {
-      const fileInput = document.getElementById('photo');
-      const file = fileInput.files[0];
-      if (!file) {
-        document.getElementById('uploadStatus').innerHTML = "<span class='err'>Please select an image</span>";
-        return;
+      let absent = document.getElementById("absent").value;
+      let bShift = document.getElementById("bShift").value;
+      let gatePass = document.getElementById("gatePass").value;
+      let tbtTopic = document.getElementById("tbtTopic").value;
+      let photoFile = document.getElementById("photo").files[0];
+
+      // Send form data
+      google.script.run.withSuccessHandler(msg => {
+        document.getElementById("status").innerText = msg;
+      }).saveFormData(absent, bShift, gatePass, tbtTopic);
+
+      // Upload photo if provided
+      if (photoFile) {
+        const reader = new FileReader();
+        reader.onloadend = function() {
+          let base64String = reader.result.split(",")[1];
+          google.script.run.withSuccessHandler(msg => {
+            document.getElementById("status").innerText = msg;
+          }).uploadPhoto(base64String);
+        };
+        reader.readAsDataURL(photoFile);
       }
-      document.getElementById('uploadStatus').textContent = "Uploading...";
-      const reader = new FileReader();
-      reader.onload = async e => {
-        try {
-          const res = await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: JSON.stringify({
-              action: "uploadPhoto",
-              filename: file.name,
-              dataUrl: e.target.result
-            }),
-            headers: { "Content-Type": "application/json" }
-          });
-          const data = await res.json();
-          document.getElementById('uploadStatus').innerHTML = data.ok ? 
-            "<span class='ok'>✅ Uploaded</span>" : "<span class='err'>❌ Error</span>";
-        } catch (err) {
-          document.getElementById('uploadStatus').innerHTML = "<span class='err'>❌ "+err+"</span>";
-        }
-      };
-      reader.readAsDataURL(file);
-    }
+    });
   </script>
 </body>
 </html>
