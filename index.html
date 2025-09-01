@@ -88,7 +88,7 @@
                 <!-- TBT Photo Upload -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        TBT Photo
+                        TBT Photo (All formats supported)
                     </label>
                     <div 
                         id="uploadArea" 
@@ -99,6 +99,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                             </svg>
                             <p class="text-sm text-gray-600">Upload photo</p>
+                            <p class="text-xs text-gray-400 mt-1">JPG, PNG, GIF, BMP, WEBP, TIFF, SVG, ICO, HEIC, HEIF</p>
                         </div>
                         <div id="uploadedFile" class="hidden">
                             <div class="flex items-center justify-center space-x-2">
@@ -110,7 +111,7 @@
                             <button type="button" id="removeFile" class="mt-1 text-xs text-red-600 hover:text-red-500">Remove</button>
                         </div>
                     </div>
-                    <input type="file" id="fileInput" accept="image/*" class="hidden">
+                    <input type="file" id="fileInput" accept="image/*,.jpg,.jpeg,.png,.gif,.bmp,.webp,.tiff,.tif,.svg,.ico,.heic,.heif,.raw,.cr2,.nef,.arw,.dng" class="hidden">
                 </div>
 
                 <!-- Submit Button -->
@@ -139,6 +140,12 @@
         const uploadedFile = document.getElementById('uploadedFile');
         const fileName = document.getElementById('fileName');
         const removeFile = document.getElementById('removeFile');
+
+        // Comprehensive list of supported image formats
+        const supportedFormats = [
+            'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'tiff', 'tif', 
+            'svg', 'ico', 'heic', 'heif', 'raw', 'cr2', 'nef', 'arw', 'dng'
+        ];
 
         uploadArea.addEventListener('click', () => fileInput.click());
 
@@ -173,12 +180,15 @@
         });
 
         function handleFile(file) {
-            if (file.type.startsWith('image/')) {
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            
+            // Check if file is an image or supported format
+            if (file.type.startsWith('image/') || supportedFormats.includes(fileExtension)) {
                 fileName.textContent = file.name;
                 uploadContent.classList.add('hidden');
                 uploadedFile.classList.remove('hidden');
             } else {
-                alert('Please select an image file');
+                alert('Please select a valid image file. Supported formats: JPG, PNG, GIF, BMP, WEBP, TIFF, SVG, ICO, HEIC, HEIF, RAW, CR2, NEF, ARW, DNG');
             }
         }
 
@@ -219,6 +229,12 @@
                             imageData: base64Data,
                             imageName: fileInput.files[0].name
                         });
+                    };
+                    reader.onerror = function() {
+                        alert('Error reading file. Please try again.');
+                        submitButton.textContent = originalText;
+                        submitButton.disabled = false;
+                        isSubmitting = false;
                     };
                     reader.readAsDataURL(fileInput.files[0]);
                 } else {
@@ -262,8 +278,9 @@
                 });
 
                 const result = await response.text();
+                console.log('Server response:', result);
                 
-                if (response.ok) {
+                if (response.ok && result.includes('Success')) {
                     document.getElementById('statusMessage').classList.remove('hidden');
                     // Reset form
                     document.getElementById('dailyReportsForm').reset();
@@ -274,11 +291,11 @@
                         document.getElementById('statusMessage').classList.add('hidden');
                     }, 3000);
                 } else {
-                    throw new Error('Failed to update reports');
+                    throw new Error('Server returned: ' + result);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error connecting to Google Sheets. Please check your connection.');
+                alert('Error connecting to Google Sheets: ' + error.message);
             } finally {
                 // Re-enable the button and reset submission state
                 const submitButton = document.querySelector('button[type="submit"]');
@@ -288,5 +305,5 @@
             }
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9782b1fc73fe3d3f',t:'MTc1NjcwNzk3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9782bf1bf4da2982',t:'MTc1NjcwODUxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
