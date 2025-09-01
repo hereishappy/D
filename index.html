@@ -221,6 +221,16 @@
     </div>
 
     <script>
+        // Convert file to base64
+        function convertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         // File upload handling
         const fileInput = document.getElementById('tbtPhoto');
         const fileText = document.getElementById('fileText');
@@ -253,18 +263,25 @@
             statusMessage.innerHTML = '⏳ Updating Google Sheet...';
             
             try {
-                const formData = new FormData();
-                formData.append('absentCount', absentCount);
-                formData.append('bShiftCount', bShiftCount);
-                formData.append('tbtTopic', tbtTopic);
-                
+                let photoBase64 = '';
                 if (tbtPhoto) {
-                    formData.append('tbtPhoto', tbtPhoto);
+                    photoBase64 = await convertToBase64(tbtPhoto);
                 }
+                
+                const data = {
+                    absentCount: absentCount,
+                    bShiftCount: bShiftCount,
+                    tbtTopic: tbtTopic,
+                    tbtPhoto: photoBase64,
+                    photoName: tbtPhoto ? tbtPhoto.name : ''
+                };
                 
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
                 });
                 
                 if (response.ok) {
