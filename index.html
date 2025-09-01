@@ -167,10 +167,18 @@
             }
         }
 
-        // Form submission
+        // Form submission with double-click prevention
+        let isSubmitting = false;
+        
         document.getElementById('dailyReportsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Prevent double submission
+            if (isSubmitting) {
+                return;
+            }
+            
+            isSubmitting = true;
             const submitButton = e.target.querySelector('button[type="submit"]');
             const originalText = submitButton.textContent;
             submitButton.textContent = 'Updating...';
@@ -208,14 +216,14 @@
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error updating reports. Please try again.');
-            } finally {
                 submitButton.textContent = originalText;
                 submitButton.disabled = false;
+                isSubmitting = false;
             }
         });
 
         async function sendToGoogleSheets(data) {
-            // Replace with your Google Apps Script Web App URL
+            // Your Google Apps Script Web App URL
             const scriptUrl = 'https://script.google.com/macros/s/AKfycbyEl3mCsVdSF3Tsmi8vwkxOcYN4AlDh-aAfWpxYuZSlS2FfYSOSMXdoqbZOvZ8TeHmL/exec';
             
             try {
@@ -252,8 +260,14 @@
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error connecting to Google Sheets. Please check your connection.');
+            } finally {
+                // Re-enable the button and reset submission state
+                const submitButton = document.querySelector('button[type="submit"]');
+                submitButton.textContent = 'Update Reports';
+                submitButton.disabled = false;
+                isSubmitting = false;
             }
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97824a0cb64f0e6e',t:'MTc1NjcwMzcyMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97829acca08b85fc',t:'MTc1NjcwNzAyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
