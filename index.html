@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Daily Reports — Mobile</title>
+<title>Daily Reports</title>
 <style>
   :root{
     --bg:#f7f8fb;
@@ -11,96 +11,65 @@
     --muted:#6b7280;
     --accent:#0f766e;
   }
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-  body{background:var(--bg);display:flex;align-items:flex-start;justify-content:center;padding:20px;}
-  .container{width:100%;max-width:640px;}
+  body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);padding:20px;}
+  .container{max-width:640px;margin:0 auto;}
   .card{background:var(--card);border-radius:14px;box-shadow:0 6px 24px rgba(16,24,40,0.06);padding:18px;}
   h1{margin:0 0 8px;font-size:20px;color:#0f172a;}
   p.lead{margin:0 0 14px;color:var(--muted);font-size:13px;}
   .field{margin-bottom:12px;}
   label{display:block;font-weight:600;margin-bottom:6px;font-size:13px;color:#0f172a;}
-  input[type="number"], input[type="text"], textarea{
-    width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;font-size:14px;
-    box-sizing:border-box;background:#fff;
-  }
+  input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;font-size:14px;box-sizing:border-box;}
   input[type="file"]{font-size:13px;}
-  .row{display:flex;gap:8px;}
-  .btn{
-    display:inline-block;padding:12px 14px;border-radius:10px;background:var(--accent);color:white;font-weight:700;border:0;
-    font-size:15px;width:100%;
-  }
-  .note{font-size:12px;color:var(--muted);margin-top:10px;}
-  .toast{
-    position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:#111;color:#fff;padding:12px 16px;border-radius:10px;
-    box-shadow:0 6px 18px rgba(2,6,23,0.2);display:none;z-index:9999;
-  }
-  /* Responsive spacing for mobile */
-  @media (max-width:420px){
-    .card{padding:14px;border-radius:12px;}
-    h1{font-size:18px;}
-  }
+  .btn{padding:12px 14px;border-radius:10px;background:var(--accent);color:white;font-weight:700;border:0;font-size:15px;width:100%;cursor:pointer;}
+  .btn:disabled{opacity:0.6;cursor:not-allowed;}
+  .note{font-size:12px;color:var(--muted);margin-top:6px;}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:#111;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.2);display:none;z-index:9999;}
 </style>
 </head>
 <body>
   <div class="container">
     <div class="card">
       <h1>Daily Reports</h1>
-      <p class="lead">Quickly log counts, topic, and a photo. Simple & mobile-first.</p>
+      <p class="lead">Quickly log counts, topic, and a photo.</p>
 
-      <!-- Visible form for the user -->
       <form id="reportForm">
         <div class="field">
           <label for="absent">Absent Count</label>
-          <input id="absent" name="absent" type="number" min="0" inputmode="numeric" placeholder="0" required />
+          <input id="absent" name="absent" type="number" min="0" required />
         </div>
-
         <div class="field">
           <label for="bshift">B Shift Count</label>
-          <input id="bshift" name="bshift" type="number" min="0" inputmode="numeric" placeholder="0" required />
+          <input id="bshift" name="bshift" type="number" min="0" required />
         </div>
-
         <div class="field">
           <label for="gatepass">Gate Pass Process Count</label>
-          <input id="gatepass" name="gatepass" type="number" min="0" inputmode="numeric" placeholder="0" required />
+          <input id="gatepass" name="gatepass" type="number" min="0" required />
         </div>
-
         <div class="field">
           <label for="tbt">TBT Topic</label>
-          <input id="tbt" name="tbt" type="text" maxlength="200" placeholder="Write TBT topic here..." />
+          <input id="tbt" name="tbt" type="text" maxlength="200" />
         </div>
-
         <div class="field">
           <label for="photo">Photo Upload (optional)</label>
           <input id="photo" name="photo" type="file" accept="image/*" />
-          <div class="note">Photo will be saved as image/blob string in the sheet cell A18.</div>
+          <div class="note">Photo will display directly in cell A18.</div>
         </div>
-
         <div class="field">
           <button class="btn" id="submitBtn" type="button">Save to Google Sheet</button>
         </div>
-
-        <div class="note">Make sure your Apps Script web app is deployed and the URL is set in the JS below.</div>
       </form>
-
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
-
-  <!-- Hidden iframe for form submission response (no navigation) -->
   <iframe id="hidden_iframe" name="hidden_iframe" style="display:none;"></iframe>
 
 <script>
-/*
-  Replace the placeholder below with your deployed Apps Script web app URL.
-  Example: https://script.google.com/macros/s/AKfycbx.../exec
-*/
-const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjbUZlsEf7a6FFYhXigEhbe5yuOMrqTyP27B2VJbO7ktcgoyLn4YnYmWOcZM9OF00h/exec";
+const APPS_SCRIPT_WEB_APP_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
 
 const submitBtn = document.getElementById('submitBtn');
 const form = document.getElementById('reportForm');
 const toast = document.getElementById('toast');
-const hiddenIframe = document.getElementById('hidden_iframe');
 
 function showToast(msg, ok=true){
   toast.style.display = 'block';
@@ -109,11 +78,12 @@ function showToast(msg, ok=true){
   setTimeout(()=>{ toast.style.display='none'; }, 3000);
 }
 
-// Listen for postMessage from Apps Script response (the doPost returns HTML that posts a message)
 window.addEventListener('message', function(ev){
-  // You could restrict ev.origin check to the Apps Script domain if desired
   if (!ev.data) return;
   const payload = ev.data;
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Save to Google Sheet';
+
   if (payload.status === 'ok') {
     showToast(payload.message || 'Saved ✅', true);
     form.reset();
@@ -122,23 +92,24 @@ window.addEventListener('message', function(ev){
   }
 }, false);
 
-// On click, build a form element and submit it to the Apps Script URL via an invisible iframe.
-// This avoids CORS issues that fetch would trigger.
-submitBtn.addEventListener('click', function(e){
-  // Basic client-side validation
+submitBtn.addEventListener('click', function(){
+  if (submitBtn.disabled) return;
+
   const absent = document.getElementById('absent').value.trim();
   const bshift = document.getElementById('bshift').value.trim();
   const gatepass = document.getElementById('gatepass').value.trim();
   if (absent === '' || bshift === '' || gatepass === '') {
-    showToast('Please fill numeric counts (Absent, B Shift, Gate Pass).', false);
+    showToast('Please fill all counts.', false);
     return;
   }
-  if (APPS_SCRIPT_WEB_APP_URL === "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE") {
-    showToast('Replace the Apps Script URL in the code before using.', false);
+  if (APPS_SCRIPT_WEB_APP_URL.includes("YOUR_APPS_SCRIPT_WEB_APP_URL_HERE")) {
+    showToast('Replace the Apps Script URL in code.', false);
     return;
   }
 
-  // Create a fresh form (so we don't disturb the visible form)
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving...';
+
   const tempForm = document.createElement('form');
   tempForm.style.display = 'none';
   tempForm.method = 'POST';
@@ -146,13 +117,7 @@ submitBtn.addEventListener('click', function(e){
   tempForm.action = APPS_SCRIPT_WEB_APP_URL;
   tempForm.target = 'hidden_iframe';
 
-  // Append inputs
-  const fields = {
-    absent: absent,
-    bshift: bshift,
-    gatepass: gatepass,
-    tbt: document.getElementById('tbt').value || ''
-  };
+  const fields = {absent,bshift,gatepass,tbt:document.getElementById('tbt').value||''};
   Object.keys(fields).forEach(k=>{
     const inp = document.createElement('input');
     inp.type = 'hidden';
@@ -161,34 +126,25 @@ submitBtn.addEventListener('click', function(e){
     tempForm.appendChild(inp);
   });
 
-  // If a file is selected, clone the file input into the temp form
   const fileInput = document.getElementById('photo');
   if (fileInput.files && fileInput.files.length > 0) {
     const file = fileInput.files[0];
-    // Create a new input type=file and attach same file by using DataTransfer (works in modern browsers)
-    const fileHolder = document.createElement('input');
-    fileHolder.type = 'file';
-    fileHolder.name = 'photo';
-    // Use DataTransfer to set files programmatically
     try {
       const dt = new DataTransfer();
       dt.items.add(file);
+      const fileHolder = document.createElement('input');
+      fileHolder.type = 'file';
+      fileHolder.name = 'photo';
       fileHolder.files = dt.files;
       tempForm.appendChild(fileHolder);
     } catch (err) {
-      // Fallback: append the original file input (this moves it into the hidden form)
       tempForm.appendChild(fileInput);
     }
   }
 
   document.body.appendChild(tempForm);
   tempForm.submit();
-
-  // Cleanup temp form after a short delay
-  setTimeout(()=> {
-    try { document.body.removeChild(tempForm); } catch(e){}
-  }, 1000);
-
+  setTimeout(()=>{ try{document.body.removeChild(tempForm);}catch(e){} },1000);
   showToast('Saving... hang tight 🌟');
 });
 </script>
