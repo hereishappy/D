@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Construction Safety - TBT Image Upload</title>
+    <title>Daily Reports Update</title>
     <style>
         * {
             margin: 0;
@@ -22,565 +22,327 @@
         }
 
         .container {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             padding: 40px;
-            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
             width: 100%;
-            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .header {
+            text-align: center;
             margin-bottom: 30px;
         }
 
         .header h1 {
             color: #333;
-            font-size: 2.2em;
-            margin-bottom: 10px;
+            font-size: 28px;
             font-weight: 700;
+            margin-bottom: 8px;
         }
 
         .header p {
             color: #666;
-            font-size: 1.1em;
-        }
-
-        .safety-icon {
-            font-size: 4em;
-            color: #ff6b35;
-            margin-bottom: 20px;
+            font-size: 14px;
         }
 
         .form-group {
             margin-bottom: 25px;
-            text-align: left;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
             color: #333;
             font-weight: 600;
-            font-size: 1.1em;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
 
-        .form-group input[type="text"] {
+        .form-input {
             width: 100%;
             padding: 15px;
             border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 1em;
+            border-radius: 12px;
+            font-size: 16px;
             transition: all 0.3s ease;
-            background: #f8f9fa;
+            background: #fff;
         }
 
-        .form-group input[type="text"]:focus {
+        .form-input:focus {
             outline: none;
             border-color: #667eea;
-            background: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .upload-zone {
-            border: 3px dashed #667eea;
-            border-radius: 15px;
-            padding: 40px 20px;
-            background: linear-gradient(45deg, #f8f9ff 0%, #fff 100%);
-            transition: all 0.3s ease;
-            cursor: pointer;
+        .file-upload {
             position: relative;
-            overflow: hidden;
+            display: inline-block;
+            width: 100%;
         }
 
-        .upload-zone:hover {
-            border-color: #5a67d8;
-            background: linear-gradient(45deg, #f0f2ff 0%, #fff 100%);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
         }
 
-        .upload-zone.dragover {
-            border-color: #4c51bf;
-            background: linear-gradient(45deg, #e6f3ff 0%, #fff 100%);
-            transform: scale(1.02);
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: 2px dashed #e1e5e9;
+            border-radius: 12px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 60px;
         }
 
-        .upload-icon {
-            font-size: 3em;
+        .file-upload-label:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .file-upload-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .file-selected {
             color: #667eea;
-            margin-bottom: 15px;
+            font-weight: 600;
         }
 
-        .upload-text {
-            color: #4a5568;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .upload-subtext {
-            color: #718096;
-            font-size: 0.9em;
-        }
-
-        #imageInput {
-            display: none;
-        }
-
-        .preview-container {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .preview-image {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .file-info {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f7fafc;
-            border-radius: 8px;
-            color: #4a5568;
-            font-size: 0.9em;
-        }
-
-        .upload-btn {
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1.1em;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            margin-top: 10px;
         }
 
-        .upload-btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .upload-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .submit-btn:active {
+            transform: translateY(0);
         }
 
-        .status {
+        .status-message {
             margin-top: 20px;
             padding: 15px;
-            border-radius: 10px;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
         }
 
-        .status.success {
-            background: #c6f6d5;
-            color: #22543d;
-            border: 2px solid #48bb78;
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
-        .status.error {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 2px solid #e53e3e;
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
 
-        .status.uploading {
-            background: #bee3f8;
-            color: #2c5282;
-            border: 2px solid #3182ce;
+        .integration-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 13px;
+            line-height: 1.5;
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #bee3f8;
-            border-radius: 50%;
-            border-top-color: #3182ce;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 3px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 3px;
+        .integration-note strong {
+            color: #333;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="safety-icon">⚠️</div>
-            <h1>Construction Safety TBT</h1>
-            <p>Upload safety images and toolbox talk topics</p>
+            <h1>📊 Daily Reports Update</h1>
+            <p>Update daily metrics for team tracking</p>
         </div>
 
-        <form id="uploadForm">
+
+
+        <form id="dataForm">
             <div class="form-group">
-                <label for="tbtTopic">Toolbox Talk Topic:</label>
-                <input type="text" id="tbtTopic" name="tbtTopic" placeholder="Enter the TBT topic..." required>
+                <label for="absentCount">📋 Today's Absent Count</label>
+                <input type="number" id="absentCount" class="form-input" placeholder="Enter number of absences" min="0" required>
             </div>
 
             <div class="form-group">
-                <label>Safety Image Upload:</label>
-                <div class="upload-zone" id="uploadZone">
-                    <div class="upload-icon">📸</div>
-                    <div class="upload-text">Click to upload or drag and drop</div>
-                    <div class="upload-subtext">All image formats supported • Max 10MB</div>
-                    <input type="file" id="imageInput" accept="image/*" required>
-                </div>
-                
-                <div class="preview-container" id="previewContainer" style="display: none;">
-                    <img id="previewImage" class="preview-image" alt="Preview">
-                    <div class="file-info" id="fileInfo"></div>
+                <label for="bShiftCount">🕐 B Shift Count</label>
+                <input type="number" id="bShiftCount" class="form-input" placeholder="Enter B shift count" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="tbtTopic">💡 TBT Topic</label>
+                <input type="text" id="tbtTopic" class="form-input" placeholder="Enter today's TBT topic" required>
+            </div>
+
+            <div class="form-group">
+                <label for="tbtPhoto">📸 Upload TBT Photo</label>
+                <div class="file-upload">
+                    <input type="file" id="tbtPhoto" accept="image/*">
+                    <label for="tbtPhoto" class="file-upload-label">
+                        <span class="file-upload-text" id="fileText">Click to upload TBT photo or drag & drop</span>
+                    </label>
                 </div>
             </div>
 
-            <button type="submit" class="upload-btn" id="uploadBtn">
-                Upload to Safety Sheet
-            </button>
-
-            <div class="progress-bar" id="progressBar" style="display: none;">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
+            <button type="submit" class="submit-btn">✨ Update Daily Reports</button>
         </form>
 
-        <div id="status"></div>
+        <div class="status-message" id="statusMessage"></div>
     </div>
 
     <script>
-        // Replace with your actual Google Apps Script Web App URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTfrAhvPgvzO5qcaCF2QFQxXkAa_s65KX3aiS-sc17TlXjGp0mKiX_EVDcF9oDNR90/exec';
-        
-        const uploadZone = document.getElementById('uploadZone');
-        const imageInput = document.getElementById('imageInput');
-        const previewContainer = document.getElementById('previewContainer');
-        const previewImage = document.getElementById('previewImage');
-        const fileInfo = document.getElementById('fileInfo');
-        const uploadForm = document.getElementById('uploadForm');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const status = document.getElementById('status');
-        const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
-        const tbtTopic = document.getElementById('tbtTopic');
+        // File upload handling
+        const fileInput = document.getElementById('tbtPhoto');
+        const fileText = document.getElementById('fileText');
 
-        // Click to upload
-        uploadZone.addEventListener('click', () => imageInput.click());
-
-        // Drag and drop functionality
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('dragover');
-        });
-
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('dragover');
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFileSelect(files[0]);
-            }
-        });
-
-        // File input change
-        imageInput.addEventListener('change', (e) => {
+        fileInput.addEventListener('change', function(e) {
             if (e.target.files.length > 0) {
-                handleFileSelect(e.target.files[0]);
+                fileText.textContent = `📁 ${e.target.files[0].name}`;
+                fileText.classList.add('file-selected');
+            } else {
+                fileText.textContent = 'Click to upload TBT photo or drag & drop';
+                fileText.classList.remove('file-selected');
             }
         });
 
-        function handleFileSelect(file) {
-            // Validate file
-            if (!file.type.startsWith('image/')) {
-                showStatus('Please select an image file.', 'error');
-                return;
-            }
+        // Google Apps Script URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyEl3mCsVdSF3Tsmi8vwkxOcYN4AlDh-aAfWpxYuZSlS2FfYSOSMXdoqbZOvZ8TeHmL/exec';
 
-            if (file.size > 10 * 1024 * 1024) {
-                showStatus('File size must be less than 10MB.', 'error');
-                return;
-            }
-
-            // Show preview
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                previewImage.src = e.target.result;
-                previewContainer.style.display = 'block';
-                
-                const fileSize = (file.size / 1024 / 1024).toFixed(2);
-                fileInfo.textContent = `${file.name} (${fileSize} MB)`;
-            };
-            reader.readAsDataURL(file);
-
-            // Store file for upload
-            imageInput.files = new DataTransfer().files;
-            const dt = new DataTransfer();
-            dt.items.add(file);
-            imageInput.files = dt.files;
-        }
-
-        // Form submission
-        uploadForm.addEventListener('submit', async (e) => {
+        // Form submission handling
+        document.getElementById('dataForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            if (!imageInput.files[0]) {
-                showStatus('Please select an image file.', 'error');
-                return;
-            }
-
-            if (!tbtTopic.value.trim()) {
-                showStatus('Please enter a TBT topic.', 'error');
-                return;
-            }
-
-            await uploadToSheet();
-        });
-
-        async function uploadToSheet() {
-            const file = imageInput.files[0];
-            const topic = tbtTopic.value.trim();
+            const absentCount = document.getElementById('absentCount').value;
+            const bShiftCount = document.getElementById('bShiftCount').value;
+            const tbtTopic = document.getElementById('tbtTopic').value;
+            const tbtPhoto = document.getElementById('tbtPhoto').files[0];
             
-            uploadBtn.disabled = true;
-            showStatus('Preparing upload...', 'uploading');
-            progressBar.style.display = 'block';
-
-            try {
-                // Resize image before upload to reduce size
-                const resizedBase64 = await resizeImage(file, 800, 600);
-                
-                updateProgress(20);
-                showStatus('Uploading to safety sheet...', 'uploading');
-                
-                // Try multiple upload methods
-                let result = null;
-                let lastError = null;
-                
-                // Method 1: FormData (most reliable for Google Apps Script)
-                try {
-                    result = await uploadWithFormData(resizedBase64, file.name, file.type, topic);
-                } catch (error) {
-                    console.log('FormData method failed:', error);
-                    lastError = error;
-                }
-                
-                // Method 2: Fallback with form submission if fetch fails
-                if (!result) {
-                    try {
-                        result = await uploadWithFormSubmission(resizedBase64, file.name, file.type, topic);
-                    } catch (error) {
-                        console.log('Form submission method failed:', error);
-                        lastError = error;
-                    }
-                }
-                
-                updateProgress(100);
-
-                if (result && result.success) {
-                    showStatus('✅ Successfully uploaded to safety sheet!', 'success');
-                    uploadForm.reset();
-                    previewContainer.style.display = 'none';
-                    setTimeout(() => {
-                        progressBar.style.display = 'none';
-                        progressFill.style.width = '0%';
-                    }, 2000);
-                } else {
-                    throw lastError || new Error(result?.error || 'Upload failed');
-                }
-
-            } catch (error) {
-                console.error('Upload error:', error);
-                let errorMessage = error.message;
-                
-                if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
-                    errorMessage = 'Network error. Please check your internet connection and try again.';
-                }
-                
-                showStatus(`❌ Upload failed: ${errorMessage}`, 'error');
-                progressBar.style.display = 'none';
-                progressFill.style.width = '0%';
-            } finally {
-                uploadBtn.disabled = false;
-            }
-        }
-
-        async function uploadWithFormData(base64, filename, mimeType, topic) {
-            updateProgress(40);
-            
-            const formData = new FormData();
-            formData.append('image', base64);
-            formData.append('filename', filename);
-            formData.append('mimeType', mimeType);
-            formData.append('tbtTopic', topic);
-
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: formData,
-                mode: 'cors'
-            });
-
-            updateProgress(70);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const responseText = await response.text();
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.style.display = 'block';
+            statusMessage.className = 'status-message';
+            statusMessage.innerHTML = '⏳ Updating Google Sheet...';
             
             try {
-                return JSON.parse(responseText);
-            } catch (parseError) {
-                console.error('Response parsing error:', parseError);
-                console.error('Raw response:', responseText);
-                throw new Error('Invalid response from server');
-            }
-        }
-
-        async function uploadWithFormSubmission(base64, filename, mimeType, topic) {
-            return new Promise((resolve, reject) => {
-                updateProgress(50);
+                const formData = new FormData();
+                formData.append('absentCount', absentCount);
+                formData.append('bShiftCount', bShiftCount);
+                formData.append('tbtTopic', tbtTopic);
                 
-                // Create a hidden form for submission
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = SCRIPT_URL;
-                form.target = 'upload-frame';
-                form.style.display = 'none';
+                if (tbtPhoto) {
+                    formData.append('tbtPhoto', tbtPhoto);
+                }
                 
-                // Create hidden inputs
-                const inputs = [
-                    { name: 'image', value: base64 },
-                    { name: 'filename', value: filename },
-                    { name: 'mimeType', value: mimeType },
-                    { name: 'tbtTopic', value: topic }
-                ];
-                
-                inputs.forEach(input => {
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = input.name;
-                    hiddenInput.value = input.value;
-                    form.appendChild(hiddenInput);
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
                 });
                 
-                // Create hidden iframe
-                const iframe = document.createElement('iframe');
-                iframe.name = 'upload-frame';
-                iframe.style.display = 'none';
-                
-                // Handle iframe load
-                iframe.onload = function() {
-                    updateProgress(90);
+                if (response.ok) {
+                    statusMessage.className = 'status-message status-success';
+                    statusMessage.innerHTML = '✅ Successfully updated Google Sheet!';
                     
-                    try {
-                        const response = iframe.contentDocument.body.textContent;
-                        const result = JSON.parse(response);
-                        
-                        // Clean up
-                        document.body.removeChild(form);
-                        document.body.removeChild(iframe);
-                        
-                        resolve(result);
-                    } catch (error) {
-                        console.error('Form submission response error:', error);
-                        reject(new Error('Failed to parse response from form submission'));
-                    }
-                };
+                    // Reset form after successful submission
+                    setTimeout(() => {
+                        document.getElementById('dataForm').reset();
+                        fileText.textContent = 'Click to upload TBT photo or drag & drop';
+                        fileText.classList.remove('file-selected');
+                        statusMessage.style.display = 'none';
+                    }, 3000);
+                } else {
+                    throw new Error('Update failed');
+                }
                 
-                iframe.onerror = function() {
-                    reject(new Error('Form submission failed'));
-                };
+            } catch (error) {
+                statusMessage.className = 'status-message status-error';
+                statusMessage.innerHTML = '❌ Failed to update sheet. Please check connection and try again.';
+                console.error('Error:', error);
                 
-                // Add to DOM and submit
-                document.body.appendChild(form);
-                document.body.appendChild(iframe);
-                form.submit();
-            });
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
+            }
+        });
+
+        // Drag and drop functionality
+        const uploadLabel = document.querySelector('.file-upload-label');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadLabel.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
         }
 
-        function resizeImage(file, maxWidth, maxHeight) {
-            return new Promise((resolve) => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const img = new Image();
-                
-                img.onload = function() {
-                    // Calculate new dimensions
-                    let { width, height } = img;
-                    
-                    if (width > maxWidth) {
-                        height = (height * maxWidth) / width;
-                        width = maxWidth;
-                    }
-                    
-                    if (height > maxHeight) {
-                        width = (width * maxHeight) / height;
-                        height = maxHeight;
-                    }
-                    
-                    // Set canvas size
-                    canvas.width = width;
-                    canvas.height = height;
-                    
-                    // Draw and compress
-                    ctx.drawImage(img, 0, 0, width, height);
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
-                    resolve(compressedBase64);
-                };
-                
-                img.src = URL.createObjectURL(file);
-            });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadLabel.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadLabel.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            uploadLabel.style.borderColor = '#667eea';
+            uploadLabel.style.background = '#f0f2ff';
         }
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
+        function unhighlight(e) {
+            uploadLabel.style.borderColor = '#e1e5e9';
+            uploadLabel.style.background = '#f8f9fa';
         }
 
-        function updateProgress(percent) {
-            progressFill.style.width = percent + '%';
+        uploadLabel.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                fileInput.files = files;
+                fileText.textContent = `📁 ${files[0].name}`;
+                fileText.classList.add('file-selected');
+            }
         }
 
-        function showStatus(message, type) {
-            status.innerHTML = type === 'uploading' 
-                ? `<div class="loading-spinner"></div>${message}` 
-                : message;
-            status.className = `status ${type}`;
-            status.style.display = 'block';
+        // Simulate real-time connection status
+        function updateConnectionStatus() {
+            const now = new Date();
+            console.log(`Connection check: ${now.toLocaleTimeString()}`);
         }
+
+        setInterval(updateConnectionStatus, 30000); // Check every 30 seconds
     </script>
 </body>
 </html>
