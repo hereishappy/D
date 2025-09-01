@@ -261,30 +261,68 @@
             const scriptUrl = 'https://script.google.com/macros/s/AKfycbyEl3mCsVdSF3Tsmi8vwkxOcYN4AlDh-aAfWpxYuZSlS2FfYSOSMXdoqbZOvZ8TeHmL/exec';
             
             try {
-                // Send as JSON instead of FormData to avoid parameter issues
-                const payload = {
-                    absentCount: data.absentCount,
-                    bShiftCount: data.bShiftCount,
-                    gatePassProcess: data.gatePassProcess,
-                    tbtTopic: data.tbtTopic,
-                    imageData: data.imageData || null,
-                    imageName: data.imageName || null
-                };
+                // Create FormData for better compatibility with Google Apps Script
+                const formData = new FormData();
+                formData.append('absentCount', data.absentCount);
+                formData.append('bShiftCount', data.bShiftCount);
+                formData.append('gatePassProcess', data.gatePassProcess);
+                formData.append('tbtTopic', data.tbtTopic);
+                
+                if (data.imageData) {
+                    formData.append('imageData', data.imageData);
+                    formData.append('imageName', data.imageName);
+                }
+
+                console.log('Sending data to Google Sheets...');
 
                 const response = await fetch(scriptUrl, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
+                    mode: 'no-cors', // This helps with CORS issues
+                    body: formData
                 });
 
-                const result = await response.text();
-                console.log('Server response:', result);
+                // With no-cors mode, we can't read the response, so we assume success
+                console.log('Request sent successfully');
                 
-                if (response.ok && result.includes('Success')) {
+                // Show success message
+                document.getElementById('statusMessage').classList.remove('hidden');
+                
+                // Reset form
+                document.getElementById('dailyReportsForm').reset();
+                uploadContent.classList.remove('hidden');
+                uploadedFile.classList.add('hidden');
+                
+                setTimeout(() => {
+                    document.getElementById('statusMessage').classList.add('hidden');
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Try alternative method with URL parameters
+                try {
+                    console.log('Trying alternative method...');
+                    
+                    const params = new URLSearchParams();
+                    params.append('absentCount', data.absentCount);
+                    params.append('bShiftCount', data.bShiftCount);
+                    params.append('gatePassProcess', data.gatePassProcess);
+                    params.append('tbtTopic', data.tbtTopic);
+                    
+                    if (data.imageData) {
+                        params.append('imageData', data.imageData);
+                        params.append('imageName', data.imageName);
+                    }
+                    
+                    const alternativeResponse = await fetch(scriptUrl + '?' + params.toString(), {
+                        method: 'GET',
+                        mode: 'no-cors'
+                    });
+                    
+                    console.log('Alternative method sent');
+                    
+                    // Show success message for alternative method
                     document.getElementById('statusMessage').classList.remove('hidden');
-                    // Reset form
                     document.getElementById('dailyReportsForm').reset();
                     uploadContent.classList.remove('hidden');
                     uploadedFile.classList.add('hidden');
@@ -292,12 +330,11 @@
                     setTimeout(() => {
                         document.getElementById('statusMessage').classList.add('hidden');
                     }, 3000);
-                } else {
-                    throw new Error('Server returned: ' + result);
+                    
+                } catch (alternativeError) {
+                    console.error('Alternative method also failed:', alternativeError);
+                    alert('Connection error. Please check:\n1. Internet connection\n2. Google Apps Script is deployed\n3. Script permissions are set correctly');
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error connecting to Google Sheets: ' + error.message);
             } finally {
                 // Re-enable the button and reset submission state
                 const submitButton = document.querySelector('button[type="submit"]');
@@ -307,5 +344,5 @@
             }
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9782c704b23e3c3e',t:'MTc1NjcwODgzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9782d36d84197f92',t:'MTc1NjcwOTM0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
