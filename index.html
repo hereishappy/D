@@ -61,6 +61,8 @@
       e.preventDefault();
 
       let submitBtn = document.getElementById("submitBtn");
+      let statusEl = document.getElementById("status");
+
       submitBtn.disabled = true;
       submitBtn.innerText = "Submitting...";
 
@@ -70,27 +72,43 @@
       let tbtTopic = document.getElementById("tbtTopic").value;
       let photoFile = document.getElementById("photo").files[0];
 
-      // Save text data
-      google.script.run.withSuccessHandler(msg => {
-        document.getElementById("status").innerText = msg;
-      }).saveFormData(absent, bShift, gatePass, tbtTopic);
+      try {
+        // 1. Save text data
+        let textRes = await fetch(scriptURL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "saveFormData",
+            absent, bShift, gatePass, tbtTopic
+          })
+        });
+        let textMsg = await textRes.text();
+        statusEl.innerText = textMsg;
 
-      // Upload photo if provided
-      if (photoFile) {
-        const reader = new FileReader();
-        reader.onloadend = function() {
-          let base64String = reader.result.split(",")[1];
-          google.script.run.withSuccessHandler(msg => {
-            document.getElementById("status").innerText = msg;
-          }).uploadPhoto(base64String);
-        };
-        reader.readAsDataURL(photoFile);
-      }
+        // 2. Upload photo (if any)
+        if (photoFile) {
+          const reader = new FileReader();
+          reader.onloadend = async function() {
+            let base64String = reader.result.split(",")[1];
+            let photoRes = await fetch(scriptURL, {
+              method: "POST",
+              body: JSON.stringify({
+                action: "uploadPhoto",
+                base64Image: base64String
+              })
+            });
+            let photoMsg = await photoRes.text();
+            statusEl.innerText = textMsg + " | " + photoMsg;
+          };
+          reader.readAsDataURL(photoFile);
+        }
 
-      // Confirmation message
-      setTimeout(() => {
         submitBtn.innerText = "Submitted ✅";
-      }, 1000);
+
+      } catch (err) {
+        statusEl.innerText = "❌ Error: " + err.message;
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Submit Again";
+      }
     });
   </script>
 </body>
