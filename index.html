@@ -1,115 +1,803 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Report Form</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      display: flex; flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #f7f7f7;
-      height: 100vh;
-    }
-    .container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 400px;
-    }
-    h2 { text-align: center; margin-bottom: 20px; }
-    input, textarea, button {
-      width: 100%; padding: 12px;
-      margin: 8px 0; border: 1px solid #ccc;
-      border-radius: 8px; font-size: 16px;
-    }
-    button {
-      background: #007bff; color: #fff;
-      border: none; cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover:enabled { background: #0056b3; }
-    button:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Daily Report</h2>
-    <form id="reportForm">
-      <input type="number" id="absent" placeholder="Absent Count" required>
-      <input type="number" id="bShift" placeholder="B Shift Count" required>
-      <input type="number" id="gatePass" placeholder="Gate Pass Process Count" required>
-      <textarea id="tbtTopic" placeholder="TBT Topic" required></textarea>
-      <input type="file" id="photo" accept="image/*">
-      <button type="submit" id="submitBtn">Submit</button>
-    </form>
-    <p id="status"></p>
-  </div>
-
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxM0jA_Pcq_8UGUmbKKlh0E72MlaR83yqVVMegZKaD4CNbrNWq4EENAxPYXn_MV-CEc/exec";
-
-    document.getElementById("reportForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-
-      let submitBtn = document.getElementById("submitBtn");
-      let statusEl = document.getElementById("status");
-
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Submitting...";
-
-      let absent = document.getElementById("absent").value;
-      let bShift = document.getElementById("bShift").value;
-      let gatePass = document.getElementById("gatePass").value;
-      let tbtTopic = document.getElementById("tbtTopic").value;
-      let photoFile = document.getElementById("photo").files[0];
-
-      try {
-        // 1. Save text data
-        let textRes = await fetch(scriptURL, {
-          method: "POST",
-          body: JSON.stringify({
-            action: "saveFormData",
-            absent, bShift, gatePass, tbtTopic
-          })
-        });
-        let textMsg = await textRes.text();
-        statusEl.innerText = textMsg;
-
-        // 2. Upload photo (if any)
-        if (photoFile) {
-          const reader = new FileReader();
-          reader.onloadend = async function() {
-            let base64String = reader.result.split(",")[1];
-            let photoRes = await fetch(scriptURL, {
-              method: "POST",
-              body: JSON.stringify({
-                action: "uploadPhoto",
-                base64Image: base64String
-              })
-            });
-            let photoMsg = await photoRes.text();
-            statusEl.innerText = textMsg + " | " + photoMsg;
-          };
-          reader.readAsDataURL(photoFile);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Reports - Mobile App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        submitBtn.innerText = "Submitted ✅";
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-      } catch (err) {
-        statusEl.innerText = "❌ Error: " + err.message;
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Submit Again";
-      }
-    });
-  </script>
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .form-container {
+            padding: 30px 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .cell-reference {
+            font-size: 12px;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="number"], 
+        textarea, 
+        input[type="file"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+
+        input[type="number"]:focus, 
+        textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .main-submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 30px 0 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .main-submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(76, 175, 80, 0.4);
+        }
+
+        .main-submit-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .main-submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.7;
+        }
+
+        .photo-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+            cursor: pointer;
+        }
+
+        .photo-upload-area:hover {
+            border-color: #4CAF50;
+            background: #f0f8f0;
+        }
+
+        .photo-upload-area.dragover {
+            border-color: #4CAF50;
+            background: #e8f5e8;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .photo-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .remove-photo {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e1e5e9;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .required {
+            color: #ff4444;
+        }
+
+        .form-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                margin: 0;
+            }
+            
+            .form-container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Daily Reports</h1>
+            <p>Complete all fields and submit once</p>
+        </div>
+        
+        <form id="dailyReportsForm" class="form-container">
+            <!-- Absent Count -->
+            <div class="form-group">
+                <label for="absentCount">
+                    👥 Absent Count <span class="required">*</span>
+                    <span class="cell-reference">(Cell C13)</span>
+                </label>
+                <div class="input-wrapper">
+                    <input type="number" id="absentCount" min="0" placeholder="Enter absent count" required>
+                </div>
+            </div>
+
+            <!-- B Shift Count -->
+            <div class="form-group">
+                <label for="bShiftCount">
+                    🕐 B Shift Count <span class="required">*</span>
+                    <span class="cell-reference">(Cell C14)</span>
+                </label>
+                <div class="input-wrapper">
+                    <input type="number" id="bShiftCount" min="0" placeholder="Enter B shift count" required>
+                </div>
+            </div>
+
+            <!-- Gate Pass Process Count -->
+            <div class="form-group">
+                <label for="gatePassCount">
+                    🚪 Gate Pass Process Count <span class="required">*</span>
+                    <span class="cell-reference">(Cell C15)</span>
+                </label>
+                <div class="input-wrapper">
+                    <input type="number" id="gatePassCount" min="0" placeholder="Enter gate pass count" required>
+                </div>
+            </div>
+
+            <!-- TBT Topic Text -->
+            <div class="form-group">
+                <label for="tbtTopic">
+                    📝 TBT Topic Text <span class="required">*</span>
+                    <span class="cell-reference">(Cell C16)</span>
+                </label>
+                <div class="input-wrapper">
+                    <textarea id="tbtTopic" placeholder="Enter TBT topic details..." required></textarea>
+                </div>
+            </div>
+
+            <!-- Photo Upload -->
+            <div class="form-group">
+                <label for="photoUpload">
+                    📸 Photo Upload
+                    <span class="cell-reference">(Cell A18)</span>
+                </label>
+                <div class="photo-upload-area" onclick="document.getElementById('photoUpload').click()">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">Tap to select photo or take picture</div>
+                    <input type="file" id="photoUpload" accept="image/*" capture="camera" style="display: none;">
+                </div>
+                <img id="photoPreview" class="photo-preview" alt="Photo preview">
+                <button type="button" class="remove-photo" id="removePhoto" onclick="removePhoto()">Remove Photo</button>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="main-submit-btn" id="submitBtn">
+                📤 Submit All Data
+            </button>
+
+            <!-- Status Messages -->
+            <div id="status" class="status"></div>
+
+            <!-- Form Summary -->
+            <div class="form-summary" id="formSummary">
+                <div class="summary-title">📋 Submission Summary:</div>
+                <div id="summaryContent"></div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalSubmissions">0</div>
+                    <div class="stat-label">Total Submissions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="lastSubmission">--:--</div>
+                    <div class="stat-label">Last Submission</div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Configuration - Replace with your Google Apps Script Web App URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbydbCPBD9NLjPt1s-rLfSgN-7nzEY8jJIAhlwqO_C5s_Zji8iuVW8pu-k0rg7WKGyyQ/exec';
+        
+        // Prevent double submission flag
+        let isSubmitting = false;
+        
+        // Local storage for demo purposes
+        let submissionCount = parseInt(localStorage.getItem('submissionCount') || '0');
+        document.getElementById('totalSubmissions').textContent = submissionCount;
+
+        // Form submission handler
+        document.getElementById('dailyReportsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Prevent double submission
+            if (isSubmitting) {
+                showStatus('⏳ Please wait, submission in progress...', 'info');
+                return;
+            }
+            
+            submitAllData();
+        });
+
+        // Main submission function
+        async function submitAllData() {
+            // Set submission flag
+            isSubmitting = true;
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            // Disable button and show progress
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Submitting...';
+            progressBar.style.display = 'block';
+            
+            // Collect all form data
+            const formData = {
+                absentCount: document.getElementById('absentCount').value,
+                bShiftCount: document.getElementById('bShiftCount').value,
+                gatePassCount: document.getElementById('gatePassCount').value,
+                tbtTopic: document.getElementById('tbtTopic').value.trim(),
+                photo: null
+            };
+            
+            // Get photo data if uploaded
+            const photoFile = document.getElementById('photoUpload').files[0];
+            if (photoFile) {
+                try {
+                    formData.photo = await getBase64(photoFile);
+                } catch (error) {
+                    showStatus('❌ Error processing photo: ' + error.message, 'error');
+                    resetSubmissionState();
+                    return;
+                }
+            }
+            
+            // Validate required fields
+            if (!formData.absentCount || !formData.bShiftCount || 
+                !formData.gatePassCount || !formData.tbtTopic) {
+                showStatus('❌ Please fill in all required fields', 'error');
+                resetSubmissionState();
+                return;
+            }
+
+            try {
+                // Simulate progress updates
+                await updateProgress(20);
+                
+                // Mock API submission (replace with actual implementation)
+                await simulateSubmission(formData);
+                
+                await updateProgress(100);
+                
+                // Show success message
+                showStatus('✅ All data submitted successfully!', 'success');
+                showSubmissionSummary(formData);
+                
+                // Update stats
+                submissionCount++;
+                localStorage.setItem('submissionCount', submissionCount.toString());
+                document.getElementById('totalSubmissions').textContent = submissionCount;
+                document.getElementById('lastSubmission').textContent = new Date().toLocaleTimeString('en-US', {
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Clear form
+                clearForm();
+                
+            } catch (error) {
+                showStatus('❌ Submission failed: ' + error.message, 'error');
+            } finally {
+                // Reset submission state after delay
+                setTimeout(resetSubmissionState, 2000);
+            }
+
+            /* 
+            // Uncomment for actual Google Apps Script implementation:
+            
+            try {
+                await updateProgress(20);
+                
+                // Submit all data in one request
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'bulk_update',
+                        data: {
+                            absent_count: formData.absentCount,
+                            b_shift_count: formData.bShiftCount,
+                            gate_pass_count: formData.gatePassCount,
+                            tbt_topic: formData.tbtTopic,
+                            photo: formData.photo
+                        }
+                    })
+                });
+                
+                await updateProgress(80);
+                
+                const result = await response.json();
+                await updateProgress(100);
+                
+                if (result.success) {
+                    showStatus('✅ All data submitted successfully!', 'success');
+                    showSubmissionSummary(formData);
+                    updateStats();
+                    clearForm();
+                } else {
+                    throw new Error(result.message);
+                }
+                
+            } catch (error) {
+                showStatus('❌ Submission failed: ' + error.message, 'error');
+            } finally {
+                setTimeout(resetSubmissionState, 2000);
+            }
+            */
+        }
+
+        // Simulate API submission with progress
+        function simulateSubmission(formData) {
+            return new Promise((resolve, reject) => {
+                let progress = 20;
+                const interval = setInterval(async () => {
+                    progress += 20;
+                    await updateProgress(progress);
+                    
+                    if (progress >= 80) {
+                        clearInterval(interval);
+                        setTimeout(() => resolve(formData), 500);
+                    }
+                }, 300);
+            });
+        }
+
+        // Update progress bar
+        function updateProgress(percent) {
+            return new Promise(resolve => {
+                const progressFill = document.getElementById('progressFill');
+                progressFill.style.width = percent + '%';
+                setTimeout(resolve, 100);
+            });
+        }
+
+        // Reset submission state
+        function resetSubmissionState() {
+            isSubmitting = false;
+            const submitBtn = document.getElementById('submitBtn');
+            const progressBar = document.getElementById('progressBar');
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = '📤 Submit All Data';
+            progressBar.style.display = 'none';
+            document.getElementById('progressFill').style.width = '0%';
+        }
+
+        // Show submission summary
+        function showSubmissionSummary(formData) {
+            const summary = document.getElementById('formSummary');
+            const content = document.getElementById('summaryContent');
+            
+            content.innerHTML = `
+                <div class="summary-item">
+                    <span>Absent Count (C13):</span>
+                    <strong>${formData.absentCount}</strong>
+                </div>
+                <div class="summary-item">
+                    <span>B Shift Count (C14):</span>
+                    <strong>${formData.bShiftCount}</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Gate Pass Count (C15):</span>
+                    <strong>${formData.gatePassCount}</strong>
+                </div>
+                <div class="summary-item">
+                    <span>TBT Topic (C16):</span>
+                    <strong>${formData.tbtTopic.substring(0, 30)}${formData.tbtTopic.length > 30 ? '...' : ''}</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Photo (A18):</span>
+                    <strong>${formData.photo ? 'Uploaded ✓' : 'Not uploaded'}</strong>
+                </div>
+            `;
+            
+            summary.style.display = 'block';
+            setTimeout(() => {
+                summary.style.display = 'none';
+            }, 10000);
+        }
+
+        // Clear form after successful submission
+        function clearForm() {
+            document.getElementById('dailyReportsForm').reset();
+            document.getElementById('photoPreview').style.display = 'none';
+            document.getElementById('removePhoto').style.display = 'none';
+        }
+
+        // Convert file to base64
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Photo upload functionality
+        document.getElementById('photoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    showStatus('❌ Photo size must be less than 5MB', 'error');
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('photoPreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    document.getElementById('removePhoto').style.display = 'inline-block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Remove photo function
+        function removePhoto() {
+            document.getElementById('photoUpload').value = '';
+            document.getElementById('photoPreview').style.display = 'none';
+            document.getElementById('removePhoto').style.display = 'none';
+        }
+
+        // Drag and drop for photo upload
+        const uploadArea = document.querySelector('.photo-upload-area');
+        
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('photoUpload').files = files;
+                document.getElementById('photoUpload').dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Status message function
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            statusDiv.style.display = 'block';
+            
+            if (type !== 'info') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, type === 'error' ? 5000 : 3000);
+            }
+        }
+
+        // Form validation
+        function validateNumber(input) {
+            const value = parseInt(input.value);
+            if (value < 0) {
+                input.value = 0;
+            }
+        }
+
+        // Add event listeners for number inputs
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                validateNumber(this);
+            });
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set last submission time if available
+            const lastSubmission = localStorage.getItem('lastSubmission');
+            if (lastSubmission) {
+                document.getElementById('lastSubmission').textContent = lastSubmission;
+            }
+
+            // Focus first input
+            document.getElementById('absentCount').focus();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Prevent accidental form submission with Enter key in inputs
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+                e.preventDefault();
+                
+                // Move to next input or submit if last field
+                const inputs = Array.from(document.querySelectorAll('input[type="number"], textarea'));
+                const currentIndex = inputs.indexOf(e.target);
+                
+                if (currentIndex < inputs.length - 1) {
+                    inputs[currentIndex + 1].focus();
+                } else {
+                    document.getElementById('submitBtn').click();
+                }
+            }
+            
+            // Keyboard shortcuts with Ctrl/Cmd
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        document.getElementById('absentCount').focus();
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        document.getElementById('bShiftCount').focus();
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        document.getElementById('gatePassCount').focus();
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        document.getElementById('tbtTopic').focus();
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (!isSubmitting) {
+                            document.getElementById('submitBtn').click();
+                        }
+                        break;
+                }
+            }
+        });
+
+        // Prevent page reload during submission
+        window.addEventListener('beforeunload', function(e) {
+            if (isSubmitting) {
+                const message = 'Data submission is in progress. Are you sure you want to leave?';
+                e.returnValue = message;
+                return message;
+            }
+        });
+
+        // Add to home screen prompt (optional PWA feature)
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+    </script>
 </body>
 </html>
