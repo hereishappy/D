@@ -4,362 +4,247 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Reports Update</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
-            font-size: 16px;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .upload-area {
+            border: 2px dashed #d1d5db;
             transition: all 0.3s ease;
-            background: #fff;
         }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        .upload-area:hover {
+            border-color: #3b82f6;
+            background-color: #f9fafb;
         }
-
-        .file-upload {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-upload input[type="file"] {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        .file-upload-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            border: 2px dashed #e1e5e9;
-            border-radius: 12px;
-            background: #f8f9fa;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 60px;
-        }
-
-        .file-upload-label:hover {
-            border-color: #667eea;
-            background: #f0f2ff;
-        }
-
-        .file-upload-text {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .file-selected {
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-
-        .status-message {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            font-weight: 600;
-            display: none;
-        }
-
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .integration-note {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .integration-note strong {
-            color: #333;
+        .upload-area.dragover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 Daily Reports Update</h1>
-            <p>Update daily metrics for team tracking</p>
-        </div>
-
-
-
-        <form id="dataForm">
-            <div class="form-group">
-                <label for="absentCount">📋 Today's Absent Count</label>
-                <input type="number" id="absentCount" class="form-input" placeholder="Enter number of absences" min="0" required>
-            </div>
-
-            <div class="form-group">
-                <label for="bShiftCount">🕐 B Shift Count</label>
-                <input type="number" id="bShiftCount" class="form-input" placeholder="Enter B shift count" min="0" required>
-            </div>
-
-            <div class="form-group">
-                <label for="tbtTopic">💡 TBT Topic</label>
-                <input type="text" id="tbtTopic" class="form-input" placeholder="Enter today's TBT topic" required>
-            </div>
-
-            <div class="form-group">
-                <label for="tbtPhoto">📸 Upload TBT Photo</label>
-                <div class="file-upload">
-                    <input type="file" id="tbtPhoto" accept="image/*,application/pdf,.doc,.docx,.txt">
-                    <label for="tbtPhoto" class="file-upload-label">
-                        <span class="file-upload-text" id="fileText">Click to upload TBT photo or drag & drop</span>
+<body class="min-h-screen bg-gray-50">
+    <div class="max-w-md mx-auto py-12 px-6">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <form id="dailyReportsForm" class="space-y-6">
+                <!-- Today's Absent Count -->
+                <div>
+                    <label for="absentCount" class="block text-sm font-medium text-gray-700 mb-2">
+                        Today's Absent Count
                     </label>
+                    <input 
+                        type="number" 
+                        id="absentCount" 
+                        name="absentCount"
+                        min="0"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="0"
+                    >
+                </div>
+
+                <!-- B Shift Count -->
+                <div>
+                    <label for="bShiftCount" class="block text-sm font-medium text-gray-700 mb-2">
+                        B Shift Count
+                    </label>
+                    <input 
+                        type="number" 
+                        id="bShiftCount" 
+                        name="bShiftCount"
+                        min="0"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="0"
+                    >
+                </div>
+
+                <!-- TBT Topic -->
+                <div>
+                    <label for="tbtTopic" class="block text-sm font-medium text-gray-700 mb-2">
+                        TBT Topic
+                    </label>
+                    <textarea 
+                        id="tbtTopic" 
+                        name="tbtTopic"
+                        rows="3"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                        placeholder="Enter topic"
+                    ></textarea>
+                </div>
+
+                <!-- TBT Photo Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        TBT Photo
+                    </label>
+                    <div 
+                        id="uploadArea" 
+                        class="upload-area rounded-md p-6 text-center cursor-pointer"
+                    >
+                        <div id="uploadContent">
+                            <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-sm text-gray-600">Upload photo</p>
+                        </div>
+                        <div id="uploadedFile" class="hidden">
+                            <div class="flex items-center justify-center space-x-2">
+                                <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-700" id="fileName"></span>
+                            </div>
+                            <button type="button" id="removeFile" class="mt-1 text-xs text-red-600 hover:text-red-500">Remove</button>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" class="hidden">
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-md transition-colors duration-200"
+                >
+                    Update Reports
+                </button>
+            </form>
+
+            <!-- Status Message -->
+            <div id="statusMessage" class="mt-4 hidden">
+                <div class="bg-green-50 border border-green-200 rounded-md p-3">
+                    <p class="text-sm text-green-800">Reports updated successfully!</p>
                 </div>
             </div>
-
-            <button type="submit" class="submit-btn">✨ Update Daily Reports</button>
-        </form>
-
-        <div class="status-message" id="statusMessage"></div>
+        </div>
     </div>
 
     <script>
-        // Convert file to base64
-        function convertToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
+        // File upload functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadContent = document.getElementById('uploadContent');
+        const uploadedFile = document.getElementById('uploadedFile');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
 
-        // File upload handling
-        const fileInput = document.getElementById('tbtPhoto');
-        const fileText = document.getElementById('fileText');
+        uploadArea.addEventListener('click', () => fileInput.click());
 
-        fileInput.addEventListener('change', function(e) {
-            if (e.target.files.length > 0) {
-                fileText.textContent = `📁 ${e.target.files[0].name}`;
-                fileText.classList.add('file-selected');
-            } else {
-                fileText.textContent = 'Click to upload TBT photo or drag & drop';
-                fileText.classList.remove('file-selected');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
             }
         });
 
-        // Google Apps Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyEl3mCsVdSF3Tsmi8vwkxOcYN4AlDh-aAfWpxYuZSlS2FfYSOSMXdoqbZOvZ8TeHmL/exec';
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
 
-        // Form submission handling
-        document.getElementById('dataForm').addEventListener('submit', async function(e) {
+        removeFile.addEventListener('click', () => {
+            fileInput.value = '';
+            uploadContent.classList.remove('hidden');
+            uploadedFile.classList.add('hidden');
+        });
+
+        function handleFile(file) {
+            if (file.type.startsWith('image/')) {
+                fileName.textContent = file.name;
+                uploadContent.classList.add('hidden');
+                uploadedFile.classList.remove('hidden');
+            } else {
+                alert('Please select an image file');
+            }
+        }
+
+        // Form submission
+        document.getElementById('dailyReportsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const absentCount = document.getElementById('absentCount').value;
-            const bShiftCount = document.getElementById('bShiftCount').value;
-            const tbtTopic = document.getElementById('tbtTopic').value;
-            const tbtPhoto = document.getElementById('tbtPhoto').files[0];
-            
-            const statusMessage = document.getElementById('statusMessage');
-            statusMessage.style.display = 'block';
-            statusMessage.className = 'status-message';
-            statusMessage.innerHTML = '⏳ Updating Google Sheet...';
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Updating...';
+            submitButton.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('absentCount', document.getElementById('absentCount').value || '0');
+                formData.append('bShiftCount', document.getElementById('bShiftCount').value || '0');
+                formData.append('tbtTopic', document.getElementById('tbtTopic').value || '');
+                
+                if (fileInput.files[0]) {
+                    // Convert image to base64 for Google Apps Script
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const base64Data = e.target.result.split(',')[1];
+                        sendToGoogleSheets({
+                            absentCount: document.getElementById('absentCount').value || '0',
+                            bShiftCount: document.getElementById('bShiftCount').value || '0',
+                            tbtTopic: document.getElementById('tbtTopic').value || '',
+                            imageData: base64Data,
+                            imageName: fileInput.files[0].name
+                        });
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    sendToGoogleSheets({
+                        absentCount: document.getElementById('absentCount').value || '0',
+                        bShiftCount: document.getElementById('bShiftCount').value || '0',
+                        tbtTopic: document.getElementById('tbtTopic').value || '',
+                        imageData: null,
+                        imageName: null
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error updating reports. Please try again.');
+            } finally {
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }
+        });
+
+        async function sendToGoogleSheets(data) {
+            // Replace with your Google Apps Script Web App URL
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbyEl3mCsVdSF3Tsmi8vwkxOcYN4AlDh-aAfWpxYuZSlS2FfYSOSMXdoqbZOvZ8TeHmL/exec';
             
             try {
-                let photoBase64 = '';
-                if (tbtPhoto) {
-                    photoBase64 = await convertToBase64(tbtPhoto);
-                }
-                
-                const data = {
-                    absentCount: absentCount,
-                    bShiftCount: bShiftCount,
-                    tbtTopic: tbtTopic,
-                    tbtPhoto: photoBase64,
-                    photoName: tbtPhoto ? tbtPhoto.name : ''
-                };
-                
-                const response = await fetch(SCRIPT_URL, {
+                const response = await fetch(scriptUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(data)
                 });
-                
+
                 if (response.ok) {
-                    statusMessage.className = 'status-message status-success';
-                    statusMessage.innerHTML = '✅ Successfully updated Google Sheet!';
+                    document.getElementById('statusMessage').classList.remove('hidden');
+                    // Reset form
+                    document.getElementById('dailyReportsForm').reset();
+                    uploadContent.classList.remove('hidden');
+                    uploadedFile.classList.add('hidden');
                     
-                    // Reset form after successful submission
                     setTimeout(() => {
-                        document.getElementById('dataForm').reset();
-                        fileText.textContent = 'Click to upload TBT photo or drag & drop';
-                        fileText.classList.remove('file-selected');
-                        statusMessage.style.display = 'none';
+                        document.getElementById('statusMessage').classList.add('hidden');
                     }, 3000);
                 } else {
-                    throw new Error('Update failed');
+                    throw new Error('Failed to update reports');
                 }
-                
             } catch (error) {
-                statusMessage.className = 'status-message status-error';
-                statusMessage.innerHTML = '❌ Failed to update sheet. Please check connection and try again.';
                 console.error('Error:', error);
-                
-                setTimeout(() => {
-                    statusMessage.style.display = 'none';
-                }, 5000);
-            }
-        });
-
-        // Drag and drop functionality
-        const uploadLabel = document.querySelector('.file-upload-label');
-
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadLabel.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadLabel.addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadLabel.addEventListener(eventName, unhighlight, false);
-        });
-
-        function highlight(e) {
-            uploadLabel.style.borderColor = '#667eea';
-            uploadLabel.style.background = '#f0f2ff';
-        }
-
-        function unhighlight(e) {
-            uploadLabel.style.borderColor = '#e1e5e9';
-            uploadLabel.style.background = '#f8f9fa';
-        }
-
-        uploadLabel.addEventListener('drop', handleDrop, false);
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            
-            if (files.length > 0) {
-                fileInput.files = files;
-                fileText.textContent = `📁 ${files[0].name}`;
-                fileText.classList.add('file-selected');
+                alert('Error connecting to Google Sheets. Please check your connection.');
             }
         }
-
-        // Simulate real-time connection status
-        function updateConnectionStatus() {
-            const now = new Date();
-            console.log(`Connection check: ${now.toLocaleTimeString()}`);
-        }
-
-        setInterval(updateConnectionStatus, 30000); // Check every 30 seconds
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97823f4464207f5e',t:'MTc1NjcwMzI3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
