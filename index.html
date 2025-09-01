@@ -31,8 +31,13 @@
     button {
       background: #007bff; color: #fff;
       border: none; cursor: pointer;
+      transition: background 0.3s;
     }
-    button:hover { background: #0056b3; }
+    button:hover:enabled { background: #0056b3; }
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -44,16 +49,20 @@
       <input type="number" id="gatePass" placeholder="Gate Pass Process Count" required>
       <textarea id="tbtTopic" placeholder="TBT Topic" required></textarea>
       <input type="file" id="photo" accept="image/*">
-      <button type="submit">Submit</button>
+      <button type="submit" id="submitBtn">Submit</button>
     </form>
     <p id="status"></p>
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyDM_0iVZmlPq0ELKeKCCIfKdYY4qBfuG7o8qJTpm7Z_Xx5L39JfedZ4k7sLk-LdJWP/exec"; // <-- Replace with Apps Script Web App URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyDM_0iVZmlPq0ELKeKCCIfKdYY4qBfuG7o8qJTpm7Z_Xx5L39JfedZ4k7sLk-LdJWP/exec";
 
     document.getElementById("reportForm").addEventListener("submit", async function(e) {
       e.preventDefault();
+
+      let submitBtn = document.getElementById("submitBtn");
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Submitting...";
 
       let absent = document.getElementById("absent").value;
       let bShift = document.getElementById("bShift").value;
@@ -61,7 +70,7 @@
       let tbtTopic = document.getElementById("tbtTopic").value;
       let photoFile = document.getElementById("photo").files[0];
 
-      // Send form data
+      // Save text data
       google.script.run.withSuccessHandler(msg => {
         document.getElementById("status").innerText = msg;
       }).saveFormData(absent, bShift, gatePass, tbtTopic);
@@ -77,6 +86,11 @@
         };
         reader.readAsDataURL(photoFile);
       }
+
+      // Confirmation message
+      setTimeout(() => {
+        submitBtn.innerText = "Submitted ✅";
+      }, 1000);
     });
   </script>
 </body>
