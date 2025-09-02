@@ -109,12 +109,12 @@
                         type="file" 
                         id="photoUpload" 
                         name="photoUpload"
-                        accept="image/*"
+                        accept="image/*,.heic,.heif"
                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                         required
                     >
                 </div>
-                <p class="text-xs text-gray-500 mt-1">Photo will be automatically compressed for upload</p>
+                <p class="text-xs text-gray-500 mt-1">Supports all formats (JPG, PNG, HEIC, WebP, etc.) - automatically compressed</p>
             </div>
 
             <!-- Submit Button -->
@@ -226,68 +226,99 @@
             }
         });
         
-        // Helper function to compress and convert image
+        // Helper function to compress and convert image (supports all formats including HEIC)
         function compressAndConvertImage(file) {
-            return new Promise((resolve, reject) => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const img = new Image();
-                
-                img.onload = function() {
-                    // Calculate new dimensions to stay under limits
-                    let { width, height } = img;
-                    const maxPixels = 500000; // Stay well under 1M pixels limit
-                    const currentPixels = width * height;
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    let img = new Image();
                     
-                    // Resize if too many pixels
-                    if (currentPixels > maxPixels) {
-                        const ratio = Math.sqrt(maxPixels / currentPixels);
-                        width = Math.floor(width * ratio);
-                        height = Math.floor(height * ratio);
-                    }
+                    // Check if it's a HEIC/HEIF file
+                    const isHEIC = file.type === 'image/heic' || file.type === 'image/heif' || 
+                                   file.name.toLowerCase().endsWith('.heic') || 
+                                   file.name.toLowerCase().endsWith('.heif');
                     
-                    // Also ensure max dimensions
-                    const maxDimension = 1000;
-                    if (width > maxDimension || height > maxDimension) {
-                        const ratio = Math.min(maxDimension / width, maxDimension / height);
-                        width = Math.floor(width * ratio);
-                        height = Math.floor(height * ratio);
-                    }
-                    
-                    // Set canvas dimensions
-                    canvas.width = width;
-                    canvas.height = height;
-                    
-                    // Draw and compress image
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // Convert to base64 with high compression
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                    
-                    // Check final size (base64 is ~33% larger than binary)
-                    const sizeInBytes = (compressedDataUrl.length * 3) / 4;
-                    const sizeInMB = sizeInBytes / (1024 * 1024);
-                    
-                    console.log(`Compressed image: ${width}x${height}, ${sizeInMB.toFixed(2)}MB`);
-                    
-                    if (sizeInMB > 1.8) {
-                        // Further compress if still too large
-                        const furtherCompressed = canvas.toDataURL('image/jpeg', 0.4);
-                        resolve(furtherCompressed);
+                    if (isHEIC) {
+                        // For HEIC files, we need to convert using createImageBitmap
+                        try {
+                            const imageBitmap = await createImageBitmap(file);
+                            processImage(imageBitmap);
+                        } catch (heicError) {
+                            console.log('HEIC conversion failed, trying alternative method');
+                            // Fallback: try to load as regular image
+                            loadAsRegularImage();
+                        }
                     } else {
-                        resolve(compressedDataUrl);
+                        // For regular image formats
+                        loadAsRegularImage();
                     }
-                };
-                
-                img.onerror = () => reject(new Error('Failed to load image'));
-                
-                // Load the image
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    img.src = e.target.result;
-                };
-                reader.onerror = () => reject(new Error('Failed to read file'));
-                reader.readAsDataURL(file);
+                    
+                    function processImage(source) {
+                        // Calculate new dimensions to stay under limits
+                        let { width, height } = source;
+                        const maxPixels = 500000; // Stay well under 1M pixels limit
+                        const currentPixels = width * height;
+                        
+                        // Resize if too many pixels
+                        if (currentPixels > maxPixels) {
+                            const ratio = Math.sqrt(maxPixels / currentPixels);
+                            width = Math.floor(width * ratio);
+                            height = Math.floor(height * ratio);
+                        }
+                        
+                        // Also ensure max dimensions
+                        const maxDimension = 1000;
+                        if (width > maxDimension || height > maxDimension) {
+                            const ratio = Math.min(maxDimension / width, maxDimension / height);
+                            width = Math.floor(width * ratio);
+                            height = Math.floor(height * ratio);
+                        }
+                        
+                        // Set canvas dimensions
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        // Draw and compress image
+                        ctx.drawImage(source, 0, 0, width, height);
+                        
+                        // Convert to base64 with high compression
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                        
+                        // Check final size (base64 is ~33% larger than binary)
+                        const sizeInBytes = (compressedDataUrl.length * 3) / 4;
+                        const sizeInMB = sizeInBytes / (1024 * 1024);
+                        
+                        console.log(`Compressed image: ${width}x${height}, ${sizeInMB.toFixed(2)}MB, Format: ${file.type || 'unknown'}`);
+                        
+                        if (sizeInMB > 1.8) {
+                            // Further compress if still too large
+                            const furtherCompressed = canvas.toDataURL('image/jpeg', 0.4);
+                            resolve(furtherCompressed);
+                        } else {
+                            resolve(compressedDataUrl);
+                        }
+                    }
+                    
+                    function loadAsRegularImage() {
+                        img.onload = function() {
+                            processImage(img);
+                        };
+                        
+                        img.onerror = () => reject(new Error('Failed to load image. Format may not be supported.'));
+                        
+                        // Load the image
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            img.src = e.target.result;
+                        };
+                        reader.onerror = () => reject(new Error('Failed to read file'));
+                        reader.readAsDataURL(file);
+                    }
+                    
+                } catch (error) {
+                    reject(new Error('Image processing failed: ' + error.message));
+                }
             });
         }
         
@@ -297,5 +328,5 @@
             this.style.height = this.scrollHeight + 'px';
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978ae6ee755349d5',t:'MTc1Njc5NDAzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978af314c2fd85fd',t:'MTc1Njc5NDUzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
