@@ -114,7 +114,7 @@
                         required
                     >
                 </div>
-                <p class="text-xs text-gray-500 mt-1">Select or take a photo to upload</p>
+                <p class="text-xs text-gray-500 mt-1">Photo will be automatically compressed for upload</p>
             </div>
 
             <!-- Submit Button -->
@@ -129,7 +129,7 @@
             <!-- Loading State -->
             <div id="loading" class="loading text-center py-4">
                 <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <p class="text-gray-600 mt-2">Submitting report...</p>
+                <p class="text-gray-600 mt-2">Compressing and submitting...</p>
             </div>
 
             <!-- Success Message -->
@@ -155,7 +155,7 @@
 
     <script>
         // Configuration - Replace with your Google Apps Script Web App URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyA-mzwIiNN8MI1VB7Dueq4LIkjZHiTVu4gob2Htqfk_XuKbgwC5Lg9ksQSh8ZUM7Eh/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx90WsqecWxigvzkpqUBcGlkGnrB7f2U-dHZX45AdgNn9wsw6vFEEvIcZT4XYxD3ZQa/exec';
 
         document.getElementById('reportForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -182,14 +182,14 @@
                     tbtTopic: document.getElementById('tbtTopic').value
                 };
                 
-                // Handle photo upload
+                // Handle photo upload with compression
                 const photoFile = document.getElementById('photoUpload').files[0];
                 if (photoFile) {
-                    // Convert to base64
-                    const base64Photo = await fileToBase64(photoFile);
-                    payload.photo = base64Photo;
+                    // Convert and compress photo
+                    const compressedPhoto = await compressAndConvertImage(photoFile);
+                    payload.photo = compressedPhoto;
                     payload.photoName = photoFile.name;
-                    payload.photoType = photoFile.type;
+                    payload.photoType = 'image/jpeg'; // Always JPEG after compression
                 }
                 
                 // Submit to Google Apps Script using URLSearchParams
@@ -226,13 +226,68 @@
             }
         });
         
-        // Helper function to convert file to base64
-        function fileToBase64(file) {
+        // Helper function to compress and convert image
+        function compressAndConvertImage(file) {
             return new Promise((resolve, reject) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    // Calculate new dimensions to stay under limits
+                    let { width, height } = img;
+                    const maxPixels = 500000; // Stay well under 1M pixels limit
+                    const currentPixels = width * height;
+                    
+                    // Resize if too many pixels
+                    if (currentPixels > maxPixels) {
+                        const ratio = Math.sqrt(maxPixels / currentPixels);
+                        width = Math.floor(width * ratio);
+                        height = Math.floor(height * ratio);
+                    }
+                    
+                    // Also ensure max dimensions
+                    const maxDimension = 1000;
+                    if (width > maxDimension || height > maxDimension) {
+                        const ratio = Math.min(maxDimension / width, maxDimension / height);
+                        width = Math.floor(width * ratio);
+                        height = Math.floor(height * ratio);
+                    }
+                    
+                    // Set canvas dimensions
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Draw and compress image
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Convert to base64 with high compression
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                    
+                    // Check final size (base64 is ~33% larger than binary)
+                    const sizeInBytes = (compressedDataUrl.length * 3) / 4;
+                    const sizeInMB = sizeInBytes / (1024 * 1024);
+                    
+                    console.log(`Compressed image: ${width}x${height}, ${sizeInMB.toFixed(2)}MB`);
+                    
+                    if (sizeInMB > 1.8) {
+                        // Further compress if still too large
+                        const furtherCompressed = canvas.toDataURL('image/jpeg', 0.4);
+                        resolve(furtherCompressed);
+                    } else {
+                        resolve(compressedDataUrl);
+                    }
+                };
+                
+                img.onerror = () => reject(new Error('Failed to load image'));
+                
+                // Load the image
                 const reader = new FileReader();
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => reject(new Error('Failed to read file'));
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
             });
         }
         
@@ -242,5 +297,5 @@
             this.style.height = this.scrollHeight + 'px';
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978ad71177a849d5',t:'MTc1Njc5MzM4My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978ae6ee755349d5',t:'MTc1Njc5NDAzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
