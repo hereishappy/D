@@ -1,152 +1,249 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Daily Reports</title>
-<style>
-  :root{
-    --bg:#f7f8fb;
-    --card:#ffffff;
-    --muted:#6b7280;
-    --accent:#0f766e;
-  }
-  body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);padding:20px;}
-  .container{max-width:640px;margin:0 auto;}
-  .card{background:var(--card);border-radius:14px;box-shadow:0 6px 24px rgba(16,24,40,0.06);padding:18px;}
-  h1{margin:0 0 8px;font-size:20px;color:#0f172a;}
-  p.lead{margin:0 0 14px;color:var(--muted);font-size:13px;}
-  .field{margin-bottom:12px;}
-  label{display:block;font-weight:600;margin-bottom:6px;font-size:13px;color:#0f172a;}
-  input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;font-size:14px;box-sizing:border-box;}
-  input[type="file"]{font-size:13px;}
-  .btn{padding:12px 14px;border-radius:10px;background:var(--accent);color:white;font-weight:700;border:0;font-size:15px;width:100%;cursor:pointer;}
-  .btn:disabled{opacity:0.6;cursor:not-allowed;}
-  .note{font-size:12px;color:var(--muted);margin-top:6px;}
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:#111;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.2);display:none;z-index:9999;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Reports App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loading {
+            display: none;
+        }
+        .loading.show {
+            display: block;
+        }
+        .success-message {
+            display: none;
+        }
+        .success-message.show {
+            display: block;
+        }
+        .error-message {
+            display: none;
+        }
+        .error-message.show {
+            display: block;
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <div class="card">
-      <h1>Daily Reports</h1>
-      <p class="lead">Quickly log counts, topic, and a photo.</p>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-6 max-w-md">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">📊 Daily Reports</h1>
+            <p class="text-gray-600">Submit your daily report data</p>
+        </div>
 
-      <form id="reportForm">
-        <div class="field">
-          <label for="absent">Absent Count</label>
-          <input id="absent" name="absent" type="number" min="0" required />
+        <!-- Form -->
+        <form id="reportForm" class="bg-white rounded-2xl shadow-lg p-6 space-y-6">
+            <!-- Absent Count -->
+            <div>
+                <label for="absentCount" class="block text-sm font-semibold text-gray-700 mb-2">
+                    👥 Absent Count
+                </label>
+                <input 
+                    type="number" 
+                    id="absentCount" 
+                    name="absentCount"
+                    min="0"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                    placeholder="Enter absent count"
+                    required
+                >
+            </div>
+
+            <!-- B Shift Count -->
+            <div>
+                <label for="bShiftCount" class="block text-sm font-semibold text-gray-700 mb-2">
+                    🌙 B Shift Count
+                </label>
+                <input 
+                    type="number" 
+                    id="bShiftCount" 
+                    name="bShiftCount"
+                    min="0"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                    placeholder="Enter B shift count"
+                    required
+                >
+            </div>
+
+            <!-- Gate Pass Process Count -->
+            <div>
+                <label for="gatePassCount" class="block text-sm font-semibold text-gray-700 mb-2">
+                    🚪 Gate Pass Process Count
+                </label>
+                <input 
+                    type="number" 
+                    id="gatePassCount" 
+                    name="gatePassCount"
+                    min="0"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                    placeholder="Enter gate pass count"
+                    required
+                >
+            </div>
+
+            <!-- TBT Topic -->
+            <div>
+                <label for="tbtTopic" class="block text-sm font-semibold text-gray-700 mb-2">
+                    💡 TBT Topic
+                </label>
+                <textarea 
+                    id="tbtTopic" 
+                    name="tbtTopic"
+                    rows="3"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg resize-none"
+                    placeholder="Enter TBT topic details"
+                    required
+                ></textarea>
+            </div>
+
+            <!-- Photo Upload -->
+            <div>
+                <label for="photoUpload" class="block text-sm font-semibold text-gray-700 mb-2">
+                    📸 Upload Photo
+                </label>
+                <div class="relative">
+                    <input 
+                        type="file" 
+                        id="photoUpload" 
+                        name="photoUpload"
+                        accept="image/*"
+                        capture="environment"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        required
+                    >
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Select or take a photo to upload</p>
+            </div>
+
+            <!-- Submit Button -->
+            <button 
+                type="submit" 
+                id="submitBtn"
+                class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+            >
+                📤 Submit Report
+            </button>
+
+            <!-- Loading State -->
+            <div id="loading" class="loading text-center py-4">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p class="text-gray-600 mt-2">Submitting report...</p>
+            </div>
+
+            <!-- Success Message -->
+            <div id="successMessage" class="success-message bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl">
+                <div class="flex items-center">
+                    <span class="text-xl mr-2">✅</span>
+                    <span>Report submitted successfully!</span>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">
+                <div class="flex items-center">
+                    <span class="text-xl mr-2">❌</span>
+                    <span id="errorText">An error occurred. Please try again.</span>
+                </div>
+            </div>
+        </form>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 text-gray-500 text-sm">
+            <p>Daily Reports System v1.0</p>
         </div>
-        <div class="field">
-          <label for="bshift">B Shift Count</label>
-          <input id="bshift" name="bshift" type="number" min="0" required />
-        </div>
-        <div class="field">
-          <label for="gatepass">Gate Pass Process Count</label>
-          <input id="gatepass" name="gatepass" type="number" min="0" required />
-        </div>
-        <div class="field">
-          <label for="tbt">TBT Topic</label>
-          <input id="tbt" name="tbt" type="text" maxlength="200" />
-        </div>
-        <div class="field">
-          <label for="photo">Photo Upload (optional)</label>
-          <input id="photo" name="photo" type="file" accept="image/*" />
-          <div class="note">Photo will display directly in cell A18.</div>
-        </div>
-        <div class="field">
-          <button class="btn" id="submitBtn" type="button">Save to Google Sheet</button>
-        </div>
-      </form>
     </div>
-  </div>
 
-  <div class="toast" id="toast"></div>
-  <iframe id="hidden_iframe" name="hidden_iframe" style="display:none;"></iframe>
+    <script>
+        // Configuration - Replace with your Google Apps Script Web App URL
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
 
-<script>
-const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjbUZlsEf7a6FFYhXigEhbe5yuOMrqTyP27B2VJbO7ktcgoyLn4YnYmWOcZM9OF00h/exec";
-
-const submitBtn = document.getElementById('submitBtn');
-const form = document.getElementById('reportForm');
-const toast = document.getElementById('toast');
-
-function showToast(msg, ok=true){
-  toast.style.display = 'block';
-  toast.style.background = ok ? '#111' : '#b91c1c';
-  toast.textContent = msg;
-  setTimeout(()=>{ toast.style.display='none'; }, 3000);
-}
-
-window.addEventListener('message', function(ev){
-  if (!ev.data) return;
-  const payload = ev.data;
-  submitBtn.disabled = false;
-  submitBtn.textContent = 'Save to Google Sheet';
-
-  if (payload.status === 'ok') {
-    showToast(payload.message || 'Saved ✅', true);
-    form.reset();
-  } else {
-    showToast(payload.message || 'Error saving', false);
-  }
-}, false);
-
-submitBtn.addEventListener('click', function(){
-  if (submitBtn.disabled) return;
-
-  const absent = document.getElementById('absent').value.trim();
-  const bshift = document.getElementById('bshift').value.trim();
-  const gatepass = document.getElementById('gatepass').value.trim();
-  if (absent === '' || bshift === '' || gatepass === '') {
-    showToast('Please fill all counts.', false);
-    return;
-  }
-  if (APPS_SCRIPT_WEB_APP_URL.includes("YOUR_APPS_SCRIPT_WEB_APP_URL_HERE")) {
-    showToast('Replace the Apps Script URL in code.', false);
-    return;
-  }
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Saving...';
-
-  const tempForm = document.createElement('form');
-  tempForm.style.display = 'none';
-  tempForm.method = 'POST';
-  tempForm.enctype = 'multipart/form-data';
-  tempForm.action = APPS_SCRIPT_WEB_APP_URL;
-  tempForm.target = 'hidden_iframe';
-
-  const fields = {absent,bshift,gatepass,tbt:document.getElementById('tbt').value||''};
-  Object.keys(fields).forEach(k=>{
-    const inp = document.createElement('input');
-    inp.type = 'hidden';
-    inp.name = k;
-    inp.value = fields[k];
-    tempForm.appendChild(inp);
-  });
-
-  const fileInput = document.getElementById('photo');
-  if (fileInput.files && fileInput.files.length > 0) {
-    const file = fileInput.files[0];
-    try {
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      const fileHolder = document.createElement('input');
-      fileHolder.type = 'file';
-      fileHolder.name = 'photo';
-      fileHolder.files = dt.files;
-      tempForm.appendChild(fileHolder);
-    } catch (err) {
-      tempForm.appendChild(fileInput);
-    }
-  }
-
-  document.body.appendChild(tempForm);
-  tempForm.submit();
-  setTimeout(()=>{ try{document.body.removeChild(tempForm);}catch(e){} },1000);
-  showToast('Saving... hang tight 🌟');
-});
-</script>
-</body>
+        document.getElementById('reportForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Reset messages
+            successMessage.classList.remove('show');
+            errorMessage.classList.remove('show');
+            
+            // Show loading state
+            submitBtn.style.display = 'none';
+            loading.classList.add('show');
+            
+            try {
+                // Get form data
+                const payload = {
+                    absentCount: document.getElementById('absentCount').value,
+                    bShiftCount: document.getElementById('bShiftCount').value,
+                    gatePassCount: document.getElementById('gatePassCount').value,
+                    tbtTopic: document.getElementById('tbtTopic').value
+                };
+                
+                // Handle photo upload
+                const photoFile = document.getElementById('photoUpload').files[0];
+                if (photoFile) {
+                    // Convert to base64
+                    const base64Photo = await fileToBase64(photoFile);
+                    payload.photo = base64Photo;
+                    payload.photoName = photoFile.name;
+                    payload.photoType = photoFile.type;
+                }
+                
+                // Submit to Google Apps Script using URLSearchParams
+                const formData = new URLSearchParams();
+                Object.keys(payload).forEach(key => {
+                    formData.append(key, payload[key]);
+                });
+                
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    successMessage.classList.add('show');
+                    document.getElementById('reportForm').reset();
+                } else {
+                    throw new Error(result.error || 'Submission failed');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorText').textContent = error.message || 'An error occurred. Please try again.';
+                errorMessage.classList.add('show');
+            } finally {
+                // Hide loading state
+                loading.classList.remove('show');
+                submitBtn.style.display = 'block';
+            }
+        });
+        
+        // Helper function to convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+        
+        // Auto-resize textarea
+        document.getElementById('tbtTopic').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978a4d55a4ba49d5',t:'MTc1Njc4Nzc0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
