@@ -34,24 +34,6 @@
             <p class="text-gray-600">Submit your TBT data</p>
         </div>
 
-        <!-- Live Data View -->
-        <div class="bg-white rounded-2xl shadow-lg p-4 mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-gray-800">Live Data</h2>
-                <button id="toggleView" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors">
-                    Hide
-                </button>
-            </div>
-            <div id="spreadsheetContainer" class="w-full">
-                <iframe 
-                    src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRxODcmDFDJLfScffQaei0ejYlolvQKi32KiWBBAp97WO7lLuD1TZHgK-ibCMn5kmW_0CsQHZMzcrHp/pubhtml?widget=true&amp;headers=false"
-                    class="w-200 h-120 border border-gray-200 rounded-lg"
-                    frameborder="0"
-                    scrolling="yes">
-                </iframe>
-            </div>
-        </div>
-
         <!-- Form -->
         <form id="reportForm" class="bg-white rounded-2xl shadow-lg p-6 space-y-6">
             <!-- Absent Count -->
@@ -391,20 +373,6 @@
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
         });
-        
-        // Toggle spreadsheet view
-        document.getElementById('toggleView').addEventListener('click', function() {
-            const container = document.getElementById('spreadsheetContainer');
-            const button = document.getElementById('toggleView');
-            
-            if (container.style.display === 'none') {
-                container.style.display = 'block';
-                button.textContent = 'Hide';
-            } else {
-                container.style.display = 'none';
-                button.textContent = 'Show';
-            }
-        });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978b352de35219bc',t:'MTc1Njc5NzIzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978b048450df8026',t:'MTc1Njc5NTI0NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
